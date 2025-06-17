@@ -25,3 +25,4 @@ class TimestampMixin:
     """
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
+

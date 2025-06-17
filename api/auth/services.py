@@ -61,3 +61,4 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
             except Exception as rollback_error:
                 print(f"Rollback failed: {str(rollback_error)}")
         raise e
+
