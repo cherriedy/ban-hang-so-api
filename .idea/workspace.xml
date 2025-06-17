@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/ban-hang-so-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ban-hang-so-api.iml" afterDir="false" />
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Fix import statement for schemas in services.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/stores/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/stores/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/railway.json" beforeDir="false" afterPath="$PROJECT_DIR$/railway.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,18 +26,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "cherriedy"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;cherriedy&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/cherriedy/ban-hang-so-api.git",
-    "accountId": "b3ba4d71-9d40-4508-94a7-c99a057d388c"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/cherriedy/ban-hang-so-api.git&quot;,
+    &quot;accountId&quot;: &quot;b3ba4d71-9d40-4508-94a7-c99a057d388c&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -54,12 +50,17 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/cherriedyy/PycharmProjects/ban-hang-so-api&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/api" />
     </key>
@@ -79,6 +80,46 @@
       <option name="presentableId" value="Default" />
       <updated>1750170879577</updated>
     </task>
+    <task id="LOCAL-00001" summary="Implement initial FastAPI setup with user authentication and store management">
+      <option name="closed" value="true" />
+      <created>1750179157314</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1750179157314</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Enhance Firebase initialization with environment variable support and error handling">
+      <option name="closed" value="true" />
+      <created>1750180031187</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1750180031187</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add email-validator dependency to requirements">
+      <option name="closed" value="true" />
+      <created>1750180385721</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1750180385721</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fix import statement for schemas in services.py">
+      <option name="closed" value="true" />
+      <created>1750180572211</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1750180572211</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Implement initial FastAPI setup with user authentication and store management" />
+    <MESSAGE value="Enhance Firebase initialization with environment variable support and error handling" />
+    <MESSAGE value="Add email-validator dependency to requirements" />
+    <MESSAGE value="Fix import statement for schemas in services.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix import statement for schemas in services.py" />
   </component>
 </project>

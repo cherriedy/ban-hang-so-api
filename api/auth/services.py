@@ -1,6 +1,8 @@
 from firebase_admin import auth, firestore
 
-from .schemas import UserSignup, UserResponse, StoreInUser  # Added UserResponse and StoreInUser
+from firebase_admin import auth, firestore
+
+from .schemas import UserSignup, UserResponse, StoreInUser  # Added UserLogin and LoginResponse
 
 db = firestore.client()
 

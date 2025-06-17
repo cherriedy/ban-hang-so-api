@@ -3,10 +3,11 @@ This module defines the Pydantic models used for user authentication.
 These models are used for request and response validation and serialization.
 """
 
-from datetime import datetime  # Added import for datetime
 from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
+
+from api.common.schemas import StoreInUser, TimestampMixin
 
 
 class UserSignup(BaseModel):
@@ -22,16 +23,7 @@ class UserSignup(BaseModel):
     imageUrl: Optional[str] = None  # An optional URL to the user\'s profile picture.
 
 
-class StoreInUser(BaseModel):  # New model for store details within UserResponse
-    """
-    Represents a store associated with a user, including its ID and role.
-    """
-
-    id: str
-    role: str
-
-
-class UserResponse(BaseModel):  # Updated UserResponse model
+class UserResponse(BaseModel, TimestampMixin):  # Updated to use TimestampMixin
     """
     Represents the response sent after a successful user operation.
     This model is used to serialize the response data according to the new structure.
@@ -41,6 +33,4 @@ class UserResponse(BaseModel):  # Updated UserResponse model
     contactName: str  # Changed from displayName
     phone: Optional[str] = None  # Added phone
     imageUrl: Optional[str] = None  # Added imageUrl
-    createdAt: datetime  # Added createdAt
-    updatedAt: datetime  # Added updatedAt
-    stores: List[StoreInUser]  # Added stores list
+    stores: List[StoreInUser]  # Using common StoreInUser model
