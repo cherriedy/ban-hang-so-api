@@ -18,7 +18,7 @@ class StoreInUser(BaseModel):
     role: str
 
 
-class TimestampMixin(BaseModel):
+class TimestampMixin:
     """
     A mixin that adds created and updated timestamp fields to models.
     Use this for consistency in models that track creation and modification times.
