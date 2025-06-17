@@ -23,7 +23,7 @@ class UserSignup(BaseModel):
     imageUrl: Optional[str] = None  # An optional URL to the user\'s profile picture.
 
 
-class UserResponse(BaseModel, TimestampMixin):  # Updated to use TimestampMixin
+class UserResponse(TimestampMixin):
     """
     Represents the response sent after a successful user operation.
     This model is used to serialize the response data according to the new structure.
