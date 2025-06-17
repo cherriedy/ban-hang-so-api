@@ -9,12 +9,41 @@ from firebase_admin import credentials
 
 load_dotenv()
 
-cred_json = os.environ.get('FIREBASE_CREDENTIALS')
-if cred_json:
-    cred = credentials.Certificate(json.loads(cred_json))
+# Load Firebase credentials
+# Priority: FIREBASE_CREDENTIALS_JSON_CONTENT env var (for production/Render)
+# Fallback: Local JSON file (for local development)
+firebase_cred_json_content = os.environ.get('FIREBASE_CREDENTIALS_JSON_CONTENT')
+
+if firebase_cred_json_content:
+    try:
+        cred_dict = json.loads(firebase_cred_json_content)
+        cred = credentials.Certificate(cred_dict)
+        print("Initialized Firebase from FIREBASE_CREDENTIALS_JSON_CONTENT env var.")
+    except json.JSONDecodeError as e:
+        print(f"CRITICAL ERROR: FIREBASE_CREDENTIALS_JSON_CONTENT is set but contains invalid JSON: {e}")
+        print(
+            "The application will now exit. Ensure the environment variable is correctly set in your hosting environment (e.g., Render).")
+        raise  # Re-raise the exception to stop the application
+    except Exception as e:  # Catch any other potential errors during cert init from env var
+        print(f"CRITICAL ERROR: Failed to initialize Firebase from FIREBASE_CREDENTIALS_JSON_CONTENT: {e}")
+        print("The application will now exit.")
+        raise
 else:
-    # Path to the service account key json
-    cred = credentials.Certificate("")
+    # FIREBASE_CREDENTIALS_JSON_CONTENT is not set, so assume local development
+    # and use the local service account key file.
+    local_cred_file = "cuahangso-firebase-adminsdk-fbsvc-22a0625424.json"
+    try:
+        cred = credentials.Certificate(local_cred_file)
+        print(f"Initialized Firebase from local JSON file: {local_cred_file}")
+    except FileNotFoundError:
+        print(f"CRITICAL ERROR: Local credentials file '{local_cred_file}' not found.")
+        print("This file is required for local development if FIREBASE_CREDENTIALS_JSON_CONTENT is not set.")
+        print("The application will now exit.")
+        raise
+    except Exception as e:  # Catch other errors like invalid format in local file
+        print(f"CRITICAL ERROR: Failed to initialize Firebase from local file '{local_cred_file}': {e}")
+        print("The application will now exit.")
+        raise
 
 firebase_admin.initialize_app(cred)
 
