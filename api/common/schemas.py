@@ -4,7 +4,8 @@ These models represent shared data structures to ensure consistency throughout t
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any, Dict, TypeVar, Generic
+from enum import Enum
 
 from pydantic import BaseModel
 
@@ -26,3 +27,39 @@ class TimestampMixin:
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
 
+
+class JSendStatus(str, Enum):
+    """
+    JSend status options according to specification.
+    """
+    SUCCESS = "success"
+    FAIL = "fail"
+    ERROR = "error"
+
+
+T = TypeVar('T')
+
+
+class JSendResponse(BaseModel, Generic[T]):
+    """
+    Base JSend response format as per https://github.com/omniti-labs/jsend
+    """
+    status: JSendStatus
+    data: Optional[T] = None
+    message: Optional[str] = None
+    code: Optional[int] = None  # For error responses
+
+    @classmethod
+    def success(cls, data: Any = None) -> 'JSendResponse':
+        """Create a success response with data"""
+        return cls(status=JSendStatus.SUCCESS, data=data)
+
+    @classmethod
+    def fail(cls, data: Dict[str, Any]) -> 'JSendResponse':
+        """Create a fail response with validation errors or other data-related failures"""
+        return cls(status=JSendStatus.FAIL, data=data)
+
+    @classmethod
+    def error(cls, message: str, code: Optional[int] = None, data: Any = None) -> 'JSendResponse':
+        """Create an error response for system or unexpected errors"""
+        return cls(status=JSendStatus.ERROR, message=message, code=code, data=data)
