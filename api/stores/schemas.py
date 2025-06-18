@@ -44,3 +44,5 @@ class UserStoresData(BaseModel):
     Stores data returned for a user in JSend format
     """
     stores: List[UserStore]
+
+

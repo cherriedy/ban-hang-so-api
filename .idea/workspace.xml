@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Fix import statement for schemas in services.py">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor store service to support both creation and updating of stores">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/stores/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/stores/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,17 +46,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/cherriedyy/PycharmProjects/ban-hang-so-api&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests in test_products.py.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.routers.executor": "Run",
+    "Python.schemas.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/cherriedyy/PycharmProjects/ban-hang-so-api",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -112,7 +116,71 @@
       <option name="project" value="LOCAL" />
       <updated>1750180572211</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Add user stores retrieval endpoint and update schemas for user response">
+      <option name="closed" value="true" />
+      <created>1750183072591</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1750183072591</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Refactor UserResponse schema to remove unnecessary inheritance and clean up imports in services.py">
+      <option name="closed" value="true" />
+      <created>1750183462853</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1750183462853</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Refactor TimestampMixin to remove inheritance from BaseModel">
+      <option name="closed" value="true" />
+      <created>1750183794655</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1750183794655</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Refactor UserResponse schema to inherit from BaseModel and clean up services.py">
+      <option name="closed" value="true" />
+      <created>1750184745675</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1750184745675</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Refactor user stores retrieval to return a list of UserStore objects directly and update related service function">
+      <option name="closed" value="true" />
+      <created>1750226339549</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1750226339549</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Fix user stores retrieval to return a list directly without awaiting the service call">
+      <option name="closed" value="true" />
+      <created>1750226699641</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1750226699641</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Add JSend response format and update user store retrieval and creation endpoints">
+      <option name="closed" value="true" />
+      <created>1750235328230</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1750235328230</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Refactor store service to support both creation and updating of stores">
+      <option name="closed" value="true" />
+      <created>1750239169837</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1750239169837</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -120,6 +188,14 @@
     <MESSAGE value="Enhance Firebase initialization with environment variable support and error handling" />
     <MESSAGE value="Add email-validator dependency to requirements" />
     <MESSAGE value="Fix import statement for schemas in services.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix import statement for schemas in services.py" />
+    <MESSAGE value="Add user stores retrieval endpoint and update schemas for user response" />
+    <MESSAGE value="Refactor UserResponse schema to remove unnecessary inheritance and clean up imports in services.py" />
+    <MESSAGE value="Refactor TimestampMixin to remove inheritance from BaseModel" />
+    <MESSAGE value="Refactor UserResponse schema to inherit from BaseModel and clean up services.py" />
+    <MESSAGE value="Refactor user stores retrieval to return a list of UserStore objects directly and update related service function" />
+    <MESSAGE value="Fix user stores retrieval to return a list directly without awaiting the service call" />
+    <MESSAGE value="Add JSend response format and update user store retrieval and creation endpoints" />
+    <MESSAGE value="Refactor store service to support both creation and updating of stores" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor store service to support both creation and updating of stores" />
   </component>
 </project>

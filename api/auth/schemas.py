@@ -1,36 +1,46 @@
 """
-This module defines the Pydantic models used for user authentication.
+This module defines the Pydantic models used for authentication.
 These models are used for request and response validation and serialization.
 """
 
 from typing import Optional, List
+from pydantic import BaseModel, EmailStr, Field
 
-from pydantic import BaseModel, EmailStr
+from api.common.schemas import JSendResponse, TimestampMixin
 
-from api.common.schemas import StoreInUser, TimestampMixin
+
+class StoreInUser(BaseModel):
+    """
+    Represents a store reference within a user document.
+    """
+    id: str
+    role: str
 
 
 class UserSignup(BaseModel):
     """
-    Represents the data required for a new user to sign up.
-    This model is used to validate the request body when a new user signs up.
+    Represents the request data for signing up a new user.
     """
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    displayName: Optional[str] = None
+    phone: Optional[str] = None
+    imageUrl: Optional[str] = None
 
-    email: EmailStr  # The email address of the user. Must be a valid email format.
-    phone: Optional[str] = None  # An optional phone number for the user.
-    password: str  # The password for the new user account.
-    displayName: str  # The display name for the new user.
-    imageUrl: Optional[str] = None  # An optional URL to the user\'s profile picture.
 
-
-class UserResponse(BaseModel, TimestampMixin):
+class UserBase(BaseModel, TimestampMixin):
     """
-    Represents the response sent after a successful user operation.
-    This model is used to serialize the response data according to the new structure.
+    Common user fields returned in responses.
     """
+    email: str
+    contactName: Optional[str] = None
+    phone: Optional[str] = None
+    imageUrl: Optional[str] = None
+    stores: List[StoreInUser] = []
 
-    email: EmailStr  # Kept EmailStr, assuming email from DB is valid
-    contactName: str  # Changed from displayName
-    phone: Optional[str] = None  # Added phone
-    imageUrl: Optional[str] = None  # Added imageUrl
-    stores: List[StoreInUser]  # Using common StoreInUser model
+
+class UserResponse(JSendResponse[UserBase]):
+    """
+    Response model for user operations.
+    """
+    pass

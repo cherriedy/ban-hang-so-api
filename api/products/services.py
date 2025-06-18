@@ -1,0 +1,244 @@
+from datetime import datetime, timezone
+from typing import Optional, Tuple
+
+from fastapi import HTTPException
+from firebase_admin import firestore
+
+from api.products.schemas import ProductInDB, ProductsData
+
+
+def get_firestore_client():
+    return firestore.client()
+
+
+async def get_products(limit: int = 100, offset: int = 0,
+                       sort_by: str = "createdAt", sort_order: str = "desc") -> ProductsData:
+    """
+    Service function to retrieve products with pagination and sorting.
+
+    Args:
+        limit: Maximum number of products to return
+        offset: Number of products to skip
+        sort_by: Field to sort by
+        sort_order: Sort direction ('asc' or 'desc')
+
+    Returns:
+        ProductsData object containing the paginated products
+
+    Raises:
+        HTTPException: If errors occur during retrieval
+    """
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+
+        # Count total products for pagination info
+        total_query = products_ref.count()
+        total = total_query.get()[0][0].value
+
+        # Get products with pagination
+        query = products_ref.order_by(sort_by, direction=sort_order.lower())
+
+        if offset > 0:
+            query = query.offset(offset)
+
+        query = query.limit(limit)
+        products_docs = query.get()
+
+        product_items = []
+        for doc in products_docs:
+            product_data = doc.to_dict()
+            product_data['id'] = doc.id
+            product_items.append(ProductInDB(**product_data))
+
+        return ProductsData(items=product_items, total=total, page=offset//limit + 1)
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def get_product_by_id(product_id: str) -> ProductInDB:
+    """
+    Service function to retrieve a single product by ID.
+
+    Args:
+        product_id: The unique identifier of the product
+
+    Returns:
+        ProductInDB object containing the product data
+
+    Raises:
+        HTTPException: If product is not found or other errors occur
+    """
+    if not product_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing product ID parameter"
+        )
+
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+        doc_ref = products_ref.document(product_id)
+        doc = doc_ref.get()
+
+        if not doc.exists:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found"
+            )
+
+        product_data = doc.to_dict()
+        product_data['id'] = doc.id
+        return ProductInDB(**product_data)
+
+    except HTTPException:
+        # Re-raise HTTP exceptions to preserve status code and detail
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def create_product(product_data: dict) -> ProductInDB:
+    """
+    Service function to create a new product.
+
+    Args:
+        product_data: The product data to create
+
+    Returns:
+        ProductInDB object containing the created product data
+
+    Raises:
+        HTTPException: If errors occur during creation
+    """
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+
+        now = datetime.now(timezone.utc)
+        product_data['createdAt'] = now
+        product_data['updatedAt'] = now
+        product_data['empty'] = False
+
+        # Create new document
+        new_product_ref = products_ref.document()
+        new_product_ref.set(product_data)
+
+        # Retrieve the created product to return
+        created_product = new_product_ref.get().to_dict()
+        created_product['id'] = new_product_ref.id
+
+        return ProductInDB(**created_product)
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def update_product(product_id: str, product_data: dict) -> ProductInDB:
+    """
+    Service function to update an existing product.
+
+    Args:
+        product_id: The unique identifier of the product to update
+        product_data: The product data to update
+
+    Returns:
+        ProductInDB object containing the updated product data
+
+    Raises:
+        HTTPException: If product is not found or other errors occur
+    """
+    if not product_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing product ID parameter"
+        )
+
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+        product_ref = products_ref.document(product_id)
+        product = product_ref.get()
+
+        if not product.exists:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found"
+            )
+
+        # Update only provided fields
+        update_data = product_data.copy()
+        update_data['updatedAt'] = datetime.now(timezone.utc)
+        product_ref.update(update_data)
+
+        # Return updated product
+        updated_product_dict = product_ref.get().to_dict()
+        if updated_product_dict is None:
+            # This can happen if the mock is not set up correctly for the second get
+            raise HTTPException(status_code=500, detail="Failed to retrieve updated product")
+
+        updated_product_dict['id'] = product_id
+        return ProductInDB(**updated_product_dict)
+
+    except HTTPException:
+        # Re-raise HTTP exceptions to preserve status code and detail
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def delete_product(product_id: str) -> bool:
+    """
+    Service function to delete a product by ID.
+
+    Args:
+        product_id: The unique identifier of the product to delete
+
+    Returns:
+        bool: True if the product was deleted successfully
+
+    Raises:
+        HTTPException: If product is not found or other errors occur
+    """
+    if not product_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing product ID parameter"
+        )
+
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+        product_ref = products_ref.document(product_id)
+        product = product_ref.get()
+
+        if not product.exists:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found"
+            )
+
+        product_ref.delete()
+        return True
+
+    except HTTPException:
+        # Re-raise HTTP exceptions to preserve status code and detail
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
