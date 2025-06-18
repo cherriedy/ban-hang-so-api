@@ -23,8 +23,10 @@ class UserStore(BaseModel, TimestampMixin):
 
 class CreateStoreRequest(BaseModel):
     """
-    Represents the request data for creating a new store.
+    Represents the request data for creating or updating a store.
+    When id is provided, the store will be updated, otherwise a new store will be created.
     """
+    id: Optional[str] = None  # Store ID for updates, None for new stores
     name: str
     description: str
     imageUrl: Optional[str] = None

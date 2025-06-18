@@ -3,7 +3,7 @@ from starlette import status
 
 from api.common.schemas import JSendResponse
 from api.stores.schemas import CreateStoreRequest, CreateStoreResponse, UserStoresData
-from api.stores.services import get_user_stores_service, create_store_service
+from api.stores.services import get_user_stores_service, save_store_service
 
 router = APIRouter()
 
@@ -55,7 +55,7 @@ async def create_store(user_id: str, store_data: CreateStoreRequest):
         JSendResponse with store creation data
     """
     try:
-        store_response = create_store_service(user_id, store_data)
+        store_response = save_store_service(user_id, store_data)
         return JSendResponse.success(store_response)
     except HTTPException as e:
         return JSendResponse.error(

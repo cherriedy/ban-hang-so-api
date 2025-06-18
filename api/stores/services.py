@@ -71,19 +71,19 @@ def get_user_stores_service(user_id: str) -> UserStoresData:
         )
 
 
-def create_store_service(user_id: str, store_data: CreateStoreRequest) -> CreateStoreResponse:
+def save_store_service(user_id: str, store_data: CreateStoreRequest) -> CreateStoreResponse:
     """
-    Service function to create a new store and associate it with a user.
+    Service function to create a new store or update an existing one and associate it with a user.
 
     Args:
         user_id: The ID of the user who owns the store
-        store_data: The store data to create
+        store_data: The store data to create or update
 
     Returns:
         CreateStoreResponse object containing the store_id
 
     Raises:
-        HTTPException: If user is not found or other errors occur
+        HTTPException: If user is not found, store is not found, or other errors occur
     """
     if not user_id:
         raise HTTPException(
@@ -103,32 +103,69 @@ def create_store_service(user_id: str, store_data: CreateStoreRequest) -> Create
                 detail="User not found"
             )
 
-        # Create store document
-        store_dict = {
-            "name": store_data.name,
-            "description": store_data.description,
-            "imageUrl": store_data.imageUrl,
-            "createdAt": firestore.firestore.SERVER_TIMESTAMP,
-            "updatedAt": firestore.firestore.SERVER_TIMESTAMP
-        }
-
-        # Add store to stores collection
-        store_ref = db.collection('stores').document()
-        store_id = store_ref.id
-        store_ref.set(store_dict)
-
-        # Update user document with store reference
+        # Extract user data
         user_data = user_doc.to_dict() or {}
         user_stores = user_data.get('stores', [])
 
-        # Add new store with ADMIN role
-        user_stores.append({
-            "id": store_id,
-            "role": "ADMIN"
-        })
+        # Check if we're updating an existing store (store_id is provided)
+        store_id = getattr(store_data, 'id', None)
+        if store_id:
+            # Validate that the store exists
+            store_ref = db.collection('stores').document(store_id)
+            store_doc = store_ref.get()
+            if not store_doc.exists:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Store with ID {store_id} not found"
+                )
 
-        # Update user document
-        user_ref.update({"stores": user_stores})
+            # Check if user has access to this store
+            user_has_access = any(store.get('id') == store_id for store in user_stores)
+            if not user_has_access:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"User does not have access to store with ID {store_id}"
+                )
+
+            # Update store document
+            store_dict = {
+                "name": store_data.name,
+                "description": store_data.description,
+                "updatedAt": firestore.firestore.SERVER_TIMESTAMP
+            }
+
+            # Only update imageUrl if provided
+            if store_data.imageUrl is not None:
+                store_dict["imageUrl"] = store_data.imageUrl
+
+            # Update the existing store
+            store_ref.update(store_dict)
+        else:
+            # Create new store document
+            store_dict = {
+                "name": store_data.name,
+                "description": store_data.description,
+                "createdAt": firestore.firestore.SERVER_TIMESTAMP,
+                "updatedAt": firestore.firestore.SERVER_TIMESTAMP
+            }
+
+            # Add imageUrl if provided
+            if store_data.imageUrl is not None:
+                store_dict["imageUrl"] = store_data.imageUrl
+
+            # Add store to stores collection
+            store_ref = db.collection('stores').document()
+            store_id = store_ref.id
+            store_ref.set(store_dict)
+
+            # Add new store with ADMIN role to user's stores
+            user_stores.append({
+                "id": store_id,
+                "role": "ADMIN"
+            })
+
+            # Update user document
+            user_ref.update({"stores": user_stores})
 
         return CreateStoreResponse(store_id=store_id)
 
