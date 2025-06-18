@@ -21,40 +21,48 @@ def test_list_products_success(client, mock_firestore):
     mock_doc1.id = "product1"
     mock_doc1.to_dict.return_value = {
         "name": "Product 1",
-        "price": 19.99,
+        "sellingPrice": 19.99,
         "description": "Test product 1",
-        "createdAt": "2025-06-01T10:00:00Z"
+        "createdAt": "2025-06-01T10:00:00Z",
+        "updatedAt": "2025-06-01T10:00:00Z",
+        "barcode": "123"
     }
 
     mock_doc2 = MagicMock()
     mock_doc2.id = "product2"
     mock_doc2.to_dict.return_value = {
         "name": "Product 2",
-        "price": 29.99,
+        "sellingPrice": 29.99,
         "description": "Test product 2",
-        "createdAt": "2025-06-02T10:00:00Z"
+        "createdAt": "2025-06-02T10:00:00Z",
+        "updatedAt": "2025-06-02T10:00:00Z",
+        "barcode": "456"
     }
 
     # Configure mock query results
-    mock_query.stream.return_value = [mock_doc1, mock_doc2]
+    mock_query.get.return_value = [mock_doc1, mock_doc2]
 
     # Mock the count query for total items
     mock_count_query = MagicMock()
     mock_products_collection.count.return_value = mock_count_query
-    mock_count_query.get.return_value = [MagicMock(count=2)]
+    mock_aggregation_result = MagicMock()
+    mock_aggregation_result.value = 2
+    mock_count_query.get.return_value = [[mock_aggregation_result]]
 
     # Make request with pagination and sorting params
     response = client.get("/products?page=1&size=10&sort_by=createdAt&sort_order=desc")
 
     # Assert response
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    assert len(response.json()["data"]["items"]) == 2
-    assert response.json()["data"]["total"] == 2
-    assert response.json()["data"]["page"] == 1
-    assert response.json()["data"]["size"] == 10
-    assert response.json()["data"]["items"][0]["id"] == "product1"
-    assert response.json()["data"]["items"][1]["id"] == "product2"
+    response_json = response.json()
+    assert response_json["status"] == "success"
+    assert len(response_json["data"]["items"]) == 2
+    assert response_json["data"]["total"] == 2
+    assert response_json["data"]["page"] == 1
+    assert response_json["data"]["size"] == 10
+    assert response_json["data"]["pages"] == 1
+    assert response_json["data"]["items"][0]["id"] == "product1"
+    assert response_json["data"]["items"][1]["id"] == "product2"
 
 
 def test_get_product_by_id_success(client, mock_firestore):
@@ -68,10 +76,11 @@ def test_get_product_by_id_success(client, mock_firestore):
     mock_product_doc.id = product_id
     mock_product_doc.to_dict.return_value = {
         "name": "Test Product",
-        "price": 24.99,
+        "sellingPrice": 24.99,
         "description": "A test product",
         "createdAt": "2025-06-10T15:30:00Z",
-        "updatedAt": "2025-06-10T15:30:00Z"
+        "updatedAt": "2025-06-10T15:30:00Z",
+        "barcode": "123"
     }
 
     # Configure the firestore mock
@@ -87,7 +96,7 @@ def test_get_product_by_id_success(client, mock_firestore):
     assert response.json()["status"] == "success"
     assert response.json()["data"]["id"] == product_id
     assert response.json()["data"]["name"] == "Test Product"
-    assert response.json()["data"]["price"] == 24.99
+    assert response.json()["data"]["sellingPrice"] == 24.99
 
 
 def test_get_product_not_found(client, mock_firestore):
@@ -118,10 +127,8 @@ def test_create_product_success(client, mock_firestore):
     # Test product data
     product_data = {
         "name": "New Product",
-        "price": 39.99,
-        "description": "A new test product",
-        "category": "Test Category",
-        "imageUrl": "https://example.com/image.jpg"
+        "sellingPrice": 39.99,
+        "description": "A new test product"
     }
 
     # Mock document reference
@@ -132,23 +139,24 @@ def test_create_product_success(client, mock_firestore):
     mock_products_collection = MagicMock()
     mock_firestore.collection.return_value = mock_products_collection
 
-    # Mock the add operation
-    mock_products_collection.add.return_value = (mock_product_ref, None)
+    # Mock the document creation
+    mock_new_doc_ref = MagicMock()
+    mock_new_doc_ref.id = "new_product_id"
+    mock_products_collection.document.return_value = mock_new_doc_ref
 
-    # Mock the document get after creation
-    mock_product_doc = MagicMock()
-    mock_product_doc.exists = True
-    mock_product_doc.id = "new_product_id"
-    mock_product_doc.to_dict.return_value = {
+    # Mock the get call after creation
+    created_doc_snapshot = MagicMock()
+    created_doc_snapshot.exists = True
+    created_doc_snapshot.id = "new_product_id"
+    created_doc_snapshot.to_dict.return_value = {
         "name": "New Product",
-        "price": 39.99,
+        "sellingPrice": 39.99,
         "description": "A new test product",
-        "category": "Test Category",
-        "imageUrl": "https://example.com/image.jpg",
         "createdAt": "2025-06-18T10:00:00Z",
-        "updatedAt": "2025-06-18T10:00:00Z"
+        "updatedAt": "2025-06-18T10:00:00Z",
+        "barcode": ""
     }
-    mock_products_collection.document.return_value.get.return_value = mock_product_doc
+    mock_new_doc_ref.get.return_value = created_doc_snapshot
 
     # Make the request
     response = client.post("/products", json=product_data)
@@ -158,7 +166,7 @@ def test_create_product_success(client, mock_firestore):
     assert response.json()["status"] == "success"
     assert response.json()["data"]["id"] == "new_product_id"
     assert response.json()["data"]["name"] == "New Product"
-    assert response.json()["data"]["price"] == 39.99
+    assert response.json()["data"]["sellingPrice"] == 39.99
 
 
 def test_update_product_success(client, mock_firestore):
@@ -169,7 +177,7 @@ def test_update_product_success(client, mock_firestore):
     # Update data
     update_data = {
         "name": "Updated Product Name",
-        "price": 49.99
+        "sellingPrice": 49.99
     }
 
     # Mock document reference and snapshot
@@ -178,10 +186,11 @@ def test_update_product_success(client, mock_firestore):
     mock_product_doc.id = product_id
     mock_product_doc.to_dict.return_value = {
         "name": "Original Product Name",
-        "price": 24.99,
+        "sellingPrice": 24.99,
         "description": "A test product",
         "createdAt": "2025-06-10T15:30:00Z",
-        "updatedAt": "2025-06-10T15:30:00Z"
+        "updatedAt": "2025-06-10T15:30:00Z",
+        "barcode": "123"
     }
 
     # Updated product doc
@@ -190,10 +199,11 @@ def test_update_product_success(client, mock_firestore):
     mock_updated_doc.id = product_id
     mock_updated_doc.to_dict.return_value = {
         "name": "Updated Product Name",
-        "price": 49.99,
+        "sellingPrice": 49.99,
         "description": "A test product",
         "createdAt": "2025-06-10T15:30:00Z",
-        "updatedAt": "2025-06-18T10:00:00Z"
+        "updatedAt": "2025-06-18T10:00:00Z",
+        "barcode": "123"
     }
 
     # Configure the firestore mock
@@ -215,7 +225,7 @@ def test_update_product_success(client, mock_firestore):
     assert response.json()["status"] == "success"
     assert response.json()["data"]["id"] == product_id
     assert response.json()["data"]["name"] == "Updated Product Name"
-    assert response.json()["data"]["price"] == 49.99
+    assert response.json()["data"]["sellingPrice"] == 49.99
     assert response.json()["data"]["description"] == "A test product"  # Unchanged field
 
 
@@ -227,7 +237,7 @@ def test_update_product_not_found(client, mock_firestore):
     # Update data
     update_data = {
         "name": "Updated Product Name",
-        "price": 49.99
+        "sellingPrice": 49.99
     }
 
     # Mock document snapshot for non-existent product

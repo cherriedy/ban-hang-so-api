@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Optional, Tuple
 
 from fastapi import HTTPException
 from firebase_admin import firestore
@@ -55,7 +54,16 @@ async def get_products(limit: int = 100, offset: int = 0,
             product_data['id'] = doc.id
             product_items.append(ProductInDB(**product_data))
 
-        return ProductsData(items=product_items, total=total, page=offset//limit + 1)
+        page = offset // limit + 1
+        pages = (total + limit - 1) // limit if limit > 0 else 0
+
+        return ProductsData(
+            items=product_items,
+            total=total,
+            page=page,
+            size=limit,
+            pages=pages
+        )
 
     except Exception as exc:
         raise HTTPException(

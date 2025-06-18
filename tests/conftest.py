@@ -2,9 +2,14 @@
 This module contains pytest fixtures and configuration for testing.
 """
 from unittest.mock import MagicMock, patch
+import sys
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+
+# Add the project's root directory to the system path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # Import the main app
 from main import app
