@@ -26,7 +26,7 @@ async def get_user_stores(user_id: str):
         List of stores directly without wrapping
     """
     try:
-        return await get_user_stores_service(user_id)
+        return get_user_stores_service(user_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
