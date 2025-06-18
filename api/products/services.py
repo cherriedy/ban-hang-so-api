@@ -37,7 +37,11 @@ async def get_products(limit: int = 100, offset: int = 0,
         total = total_query.get()[0][0].value
 
         # Get products with pagination
-        query = products_ref.order_by(sort_by, direction=sort_order.lower())
+        direction = "DESCENDING"
+        if sort_order and sort_order.lower().startswith("asc"):
+            direction = "ASCENDING"
+
+        query = products_ref.order_by(sort_by, direction=direction)
 
         if offset > 0:
             query = query.offset(offset)
