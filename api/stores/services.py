@@ -1,14 +1,15 @@
 from fastapi import HTTPException
 from firebase_admin import firestore
+from typing import List
 
-from api.stores.schemas import UserStoresResponse, UserStore  # Import the standardized schemas
+from api.stores.schemas import UserStore  # Removed UserStoresResponse as we return List directly
 
 
 def get_firestore_client():
     return firestore.client()
 
 
-def get_user_stores_service(user_id: str) -> UserStoresResponse:
+def get_user_stores_service(user_id: str) -> List[UserStore]:
     """
     Service function to retrieve all stores associated with a user.
 
@@ -16,7 +17,7 @@ def get_user_stores_service(user_id: str) -> UserStoresResponse:
         user_id: The ID of the user whose stores to retrieve
 
     Returns:
-        UserStoresResponse containing list of stores
+        List of UserStore objects directly without wrapping
 
     Raises:
         HTTPException: If user is not found or other errors occur
@@ -58,7 +59,7 @@ def get_user_stores_service(user_id: str) -> UserStoresResponse:
 
                     full_stores.append(UserStore(**store_data))
 
-        return UserStoresResponse(stores=full_stores)
+        return full_stores  # Return the list directly instead of wrapping it
 
     except HTTPException:
         # Re-raise HTTP exceptions to preserve status code and detail
