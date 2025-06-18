@@ -35,7 +35,7 @@ class ProductBase(BaseModel):
     """
     name: str
     description: str = ""
-    barcode: str = ""
+    barcode: Optional[str] = ""
     note: str = ""
     purchasePrice: float = 0
     sellingPrice: float
@@ -79,7 +79,6 @@ class ProductInDB(ProductBase, TimestampMixin):
     id: str
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
-    empty: bool = False
 
 
 class PaginationMetadata(BaseModel):

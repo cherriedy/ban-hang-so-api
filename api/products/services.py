@@ -129,7 +129,6 @@ async def create_product(product_data: dict) -> ProductInDB:
         now = datetime.now(timezone.utc)
         product_data['createdAt'] = now
         product_data['updatedAt'] = now
-        product_data['empty'] = False
 
         # Create new document
         new_product_ref = products_ref.document()
