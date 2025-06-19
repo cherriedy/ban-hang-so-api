@@ -173,7 +173,7 @@ async def create_product(product_data: dict) -> ProductInDB:
 
 async def search_products(query: str, limit: int = 100, offset: int = 0) -> ProductsData:
     """
-    Service function to search for products by name, brand, or category with pagination.
+    Service function to search for products by name, brand, category, description or SKU with pagination.
 
     Args:
         query: The search query
@@ -190,33 +190,67 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
         db = get_firestore_client()
         products_ref = db.collection('products')
 
-        query = query.lower()  # Normalize query for case-insensitive search
+        # If query is empty, return all products instead of searching
+        if not query or query.strip() == "":
+            return await get_products(limit=limit, offset=offset)
 
-        # Firestore doesn't support OR queries on different fields,
-        # so we need to perform three separate queries and merge the results.
-        name_query = products_ref.where(field_path='name', op_string='>=', value=query).where(field_path='name', op_string='<=', value=query + '\uf8ff').get()
-        brand_query = products_ref.where(field_path='brand.name', op_string='>=', value=query).where(field_path='brand.name', op_string='<=', value=query + '\uf8ff').get()
-        category_query = products_ref.where(field_path='category.name', op_string='>=', value=query).where(field_path='category.name', op_string='<=', value=query + '\uf8ff').get()
+        query = query.lower().strip()  # Normalize query for case-insensitive search
 
+        # Define search fields and create separate queries for each
+        search_fields = [
+            'name',
+            'brand.name',
+            'category.name',
+            'description',
+            'sku'
+        ]
+
+        # Dictionary to store all found products with their relevance score
         products = {}
-        for doc in name_query:
-            product_data = doc.to_dict()
-            product_data['id'] = doc.id
-            products[doc.id] = ProductInDB(**product_data)
 
-        for doc in brand_query:
-            if doc.id not in products:
-                product_data = doc.to_dict()
-                product_data['id'] = doc.id
-                products[doc.id] = ProductInDB(**product_data)
+        # Perform separate queries for each field
+        for field in search_fields:
+            field_query = (products_ref
+                .where(field_path=field, op_string='>=', value=query)
+                .where(field_path=field, op_string='<=', value=query + '\uf8ff')
+                .get())
 
-        for doc in category_query:
-            if doc.id not in products:
-                product_data = doc.to_dict()
-                product_data['id'] = doc.id
-                products[doc.id] = ProductInDB(**product_data)
+            # Process results with different weights based on field importance
+            for doc in field_query:
+                if doc.id not in products:
+                    product_data = doc.to_dict()
+                    product_data['id'] = doc.id
 
-        all_results = list(products.values())
+                    # Calculate relevance score based on which field matched
+                    # Higher weight for name matches, lower for other fields
+                    relevance_score = 0
+                    if field == 'name':
+                        relevance_score = 10  # Highest priority for name matches
+                    elif field == 'sku':
+                        relevance_score = 8   # High priority for SKU matches
+                    elif field == 'brand.name':
+                        relevance_score = 5   # Medium priority for brand matches
+                    elif field == 'category.name':
+                        relevance_score = 3   # Medium-low priority for category
+                    else:
+                        relevance_score = 1   # Lowest priority for other fields
+
+                    # Store the product with its relevance score
+                    products[doc.id] = {
+                        'product': ProductInDB(**product_data),
+                        'relevance': relevance_score
+                    }
+
+        # Sort results by relevance score (highest first)
+        sorted_products = sorted(
+            list(products.values()),
+            key=lambda item: item['relevance'],
+            reverse=True
+        )
+
+        # Extract just the product objects for the response
+        all_results = [item['product'] for item in sorted_products]
+
         total = len(all_results)
 
         # Apply pagination
