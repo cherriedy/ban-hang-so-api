@@ -3,7 +3,7 @@ from starlette import status
 
 from api.common.schemas import JSendResponse
 from api.products.schemas import (
-    ProductInDB, ProductsData, ProductCreate, ProductUpdate
+    ProductInDB, ProductsData, ProductCreate, ProductUpdate, ProductDetailData
 )
 from api.products.services import (
     get_products, get_product_by_id, create_product,
@@ -52,7 +52,7 @@ async def list_products(
         )
 
 
-@router.get("/{product_id}", response_model=JSendResponse[ProductInDB])
+@router.get("/{product_id}", response_model=JSendResponse[ProductDetailData])
 async def get_product(product_id: str = Path(..., description="The ID of the product to retrieve")):
     """
     Get a product by ID.
@@ -65,7 +65,7 @@ async def get_product(product_id: str = Path(..., description="The ID of the pro
     """
     try:
         product = await get_product_by_id(product_id)
-        return JSendResponse.success(product)
+        return JSendResponse.success(ProductDetailData(item=product))
     except HTTPException as e:
         return JSendResponse.error(
             message=str(e.detail),

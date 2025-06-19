@@ -81,6 +81,13 @@ class ProductInDB(ProductBase, TimestampMixin):
     category: Optional[CategorySchema] = None
 
 
+class ProductDetailData(BaseModel):
+    """
+    Container for a single product item.
+    """
+    item: ProductInDB
+
+
 class PaginationMetadata(BaseModel):
     """
     Standard pagination metadata structure for collection responses.

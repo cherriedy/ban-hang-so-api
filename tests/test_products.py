@@ -93,10 +93,12 @@ def test_get_product_by_id_success(client, mock_firestore):
 
     # Assert response
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    assert response.json()["data"]["id"] == product_id
-    assert response.json()["data"]["name"] == "Test Product"
-    assert response.json()["data"]["sellingPrice"] == 24.99
+    response_json = response.json()
+    assert response_json["status"] == "success"
+    assert "item" in response_json["data"]
+    assert response_json["data"]["item"]["id"] == product_id
+    assert response_json["data"]["item"]["name"] == "Test Product"
+    assert response_json["data"]["item"]["sellingPrice"] == 24.99
 
 
 def test_get_product_not_found(client, mock_firestore):
