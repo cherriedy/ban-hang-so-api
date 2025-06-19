@@ -194,9 +194,9 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
 
         # Firestore doesn't support OR queries on different fields,
         # so we need to perform three separate queries and merge the results.
-        name_query = products_ref.where('name', '>=', query).where('name', '<=', query + '\uf8ff').get()
-        brand_query = products_ref.where('brand.name', '>=', query).where('brand.name', '<=', query + '\uf8ff').get()
-        category_query = products_ref.where('category.name', '>=', query).where('category.name', '<=', query + '\uf8ff').get()
+        name_query = products_ref.where(field_path='name', op_string='>=', value=query).where(field_path='name', op_string='<=', value=query + '\uf8ff').get()
+        brand_query = products_ref.where(field_path='brand.name', op_string='>=', value=query).where(field_path='brand.name', op_string='<=', value=query + '\uf8ff').get()
+        category_query = products_ref.where(field_path='category.name', op_string='>=', value=query).where(field_path='category.name', op_string='<=', value=query + '\uf8ff').get()
 
         products = {}
         for doc in name_query:
