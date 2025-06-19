@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor Firestore queries in product service to use named parameters for improved readability">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements-dev.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements-dev.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +49,8 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python tests.Python tests for test_products.test_get_product_by_id_success.executor": "Run",
+    "Python tests.Python tests for test_search.test_search_endpoint.executor": "Run",
+    "Python tests.Python tests for test_search.test_search_products_function.executor": "Run",
     "Python tests.Python tests in test_products.py.executor": "Run",
     "Python.main.executor": "Run",
     "Python.routers.executor": "Run",
@@ -66,7 +71,7 @@
       <recent name="$PROJECT_DIR$/api" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python tests.Python tests for test_search.test_search_products_function">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ban-hang-so-api" />
       <option name="ENV_FILES" value="" />
@@ -104,8 +109,40 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_search.test_search_endpoint" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="ban-hang-so-api" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_search.test_search_endpoint&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_search.test_search_products_function" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="ban-hang-so-api" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_search.test_search_products_function&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_search.test_search_products_function" />
+        <item itemvalue="Python tests.Python tests for test_search.test_search_endpoint" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python tests.Python tests for test_products.test_get_product_by_id_success" />
       </list>
@@ -294,7 +331,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750359674468</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results">
+      <option name="closed" value="true" />
+      <created>1750360194289</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1750360194289</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -319,6 +364,7 @@
     <MESSAGE value="Refactor product search functionality to use a dedicated service and introduce a generic pagination response model" />
     <MESSAGE value="Fetch and replace brand and category data in product service; handle null cases" />
     <MESSAGE value="Refactor Firestore queries in product service to use named parameters for improved readability" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor Firestore queries in product service to use named parameters for improved readability" />
+    <MESSAGE value="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results" />
   </component>
 </project>

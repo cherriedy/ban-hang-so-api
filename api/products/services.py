@@ -196,50 +196,63 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
 
         query = query.lower().strip()  # Normalize query for case-insensitive search
 
-        # Define search fields and create separate queries for each
-        search_fields = [
-            'name',
-            'brand.name',
-            'category.name',
-            'description',
-            'sku'
-        ]
-
         # Dictionary to store all found products with their relevance score
         products = {}
 
-        # Perform separate queries for each field
-        for field in search_fields:
-            field_query = (products_ref
-                .where(field_path=field, op_string='>=', value=query)
-                .where(field_path=field, op_string='<=', value=query + '\uf8ff')
-                .get())
+        # Fetch all products and perform client-side filtering
+        # This approach allows searching for substrings anywhere in the fields
+        all_products = products_ref.get()
 
-            # Process results with different weights based on field importance
-            for doc in field_query:
-                if doc.id not in products:
-                    product_data = doc.to_dict()
-                    product_data['id'] = doc.id
+        for doc in all_products:
+            product_data = doc.to_dict()
+            product_data['id'] = doc.id
 
-                    # Calculate relevance score based on which field matched
-                    # Higher weight for name matches, lower for other fields
-                    relevance_score = 0
-                    if field == 'name':
-                        relevance_score = 10  # Highest priority for name matches
-                    elif field == 'sku':
-                        relevance_score = 8   # High priority for SKU matches
-                    elif field == 'brand.name':
-                        relevance_score = 5   # Medium priority for brand matches
-                    elif field == 'category.name':
-                        relevance_score = 3   # Medium-low priority for category
-                    else:
-                        relevance_score = 1   # Lowest priority for other fields
+            # Skip products that don't have required fields
+            if not product_data:
+                continue
 
-                    # Store the product with its relevance score
-                    products[doc.id] = {
-                        'product': ProductInDB(**product_data),
-                        'relevance': relevance_score
-                    }
+            # Initialize relevance score
+            relevance_score = 0
+
+            # Check name field (highest priority)
+            name = product_data.get('name', '').lower()
+            if query in name:
+                # Higher score for exact matches
+                if name == query:
+                    relevance_score += 15
+                # Higher score if query is at the beginning of the name
+                elif name.startswith(query):
+                    relevance_score += 12
+                # Standard score for substring matches
+                else:
+                    relevance_score += 10
+
+            # Check SKU field (high priority)
+            sku = product_data.get('sku', '').lower()
+            if query in sku:
+                relevance_score += 8
+
+            # Check brand name (medium priority)
+            brand = product_data.get('brand', {})
+            if isinstance(brand, dict) and query in brand.get('name', '').lower():
+                relevance_score += 5
+
+            # Check category name (medium-low priority)
+            category = product_data.get('category', {})
+            if isinstance(category, dict) and query in category.get('name', '').lower():
+                relevance_score += 3
+
+            # Check description (lowest priority)
+            description = product_data.get('description', '').lower()
+            if query in description:
+                relevance_score += 1
+
+            # If this product matches the query in any field, add it to the results
+            if relevance_score > 0:
+                products[doc.id] = {
+                    'product': ProductInDB(**product_data),
+                    'relevance': relevance_score
+                }
 
         # Sort results by relevance score (highest first)
         sorted_products = sorted(
