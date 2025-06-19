@@ -7,7 +7,7 @@ from api.products.schemas import (
 )
 from api.products.services import (
     get_products, get_product_by_id, create_product,
-    update_product, delete_product, search_products
+    update_product, delete_product, search_products as search_products_service
 )
 
 router = APIRouter()
@@ -70,7 +70,7 @@ async def search_products(q: str = Query(..., description="Search query"),
     try:
         offset = (page - 1) * size
         limit = size
-        products_data = await search_products(q, limit, offset)
+        products_data = await search_products_service(q, limit, offset)
         return JSendResponse.success(products_data)
     except HTTPException as e:
         return JSendResponse.error(

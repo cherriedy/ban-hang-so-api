@@ -3,12 +3,11 @@ This module defines the Pydantic models used for product management.
 These models are used for request and response validation and serialization.
 """
 
-from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from api.common.schemas import TimestampMixin, JSendResponse, JSendStatus
+from api.common.schemas import TimestampMixin, PaginationResponse, JSendResponse
 
 
 class CategorySchema(BaseModel, TimestampMixin):
@@ -88,25 +87,13 @@ class ProductDetailData(BaseModel):
     item: ProductInDB
 
 
-class PaginationMetadata(BaseModel):
+class ProductsData(PaginationResponse[ProductInDB]):
     """
-    Standard pagination metadata structure for collection responses.
+    Represents a paginated list of products.
+    Inherits pagination fields from PaginationResponse and specifies
+    ProductInDB as the type for 'items'.
     """
-    total: int = Field(..., description="Total number of items available")
-    page: int = Field(..., description="Current page number")
-    size: int = Field(..., description="Number of items per page")
-    pages: int = Field(..., description="Total number of pages")
-
-
-class ProductsData(BaseModel):
-    """
-    Container for products list with pagination metadata.
-    """
-    items: List[ProductInDB] = Field(..., description="List of products")
-    total: int = Field(..., description="Total number of products available")
-    page: int = Field(..., description="Current page number")
-    size: int = Field(..., description="Number of products per page")
-    pages: int = Field(..., description="Total number of pages")
+    pass
 
 
 class ProductResponse(JSendResponse):
@@ -163,5 +150,3 @@ class ProductUpsert(BaseModel):
     avatarUrl: Optional[str] = None
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
-
-

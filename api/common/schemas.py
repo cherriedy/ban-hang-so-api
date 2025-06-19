@@ -3,9 +3,11 @@ This module defines common Pydantic models used across multiple API modules.
 These models represent shared data structures to ensure consistency throughout the application.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional, Any, Dict, TypeVar, Generic
 from enum import Enum
+from typing import Optional, TypeVar, Generic, List, Any, Dict
 
 from pydantic import BaseModel
 
@@ -38,6 +40,17 @@ class JSendStatus(str, Enum):
 
 
 T = TypeVar('T')
+
+
+class PaginationResponse(BaseModel, Generic[T]):
+    """
+    A generic model for paginated responses.
+    """
+    items: List[T]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 class JSendResponse(BaseModel, Generic[T]):

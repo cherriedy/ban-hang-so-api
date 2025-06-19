@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add product detail response model and update product retrieval endpoint">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add search functionality for products with pagination support">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/products/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/routers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +69,29 @@
       <recent name="$PROJECT_DIR$/api" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ban-hang-so-api" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Python tests for test_products.test_get_product_by_id_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="ban-hang-so-api" />
       <option name="ENV_FILES" value="" />
@@ -87,6 +109,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python tests.Python tests for test_products.test_get_product_by_id_success" />
       </list>
     </recent_temporary>
@@ -242,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750345371482</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Add search functionality for products with pagination support">
+      <option name="closed" value="true" />
+      <created>1750357873687</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1750357873687</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -263,6 +294,7 @@
     <MESSAGE value="Refactor product schemas and services to remove unused fields" />
     <MESSAGE value="Refactor product service responses to include pagination and update price field to sellingPrice" />
     <MESSAGE value="Add product detail response model and update product retrieval endpoint" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add product detail response model and update product retrieval endpoint" />
+    <MESSAGE value="Add search functionality for products with pagination support" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add search functionality for products with pagination support" />
   </component>
 </project>
