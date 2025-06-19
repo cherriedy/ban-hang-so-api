@@ -130,6 +130,25 @@ async def create_product(product_data: dict) -> ProductInDB:
     """
     try:
         db = get_firestore_client()
+
+        # Fetch and replace brand data if provided
+        if 'brand' in product_data and product_data.get('brand'):
+            brand_id = product_data['brand']['id']
+            brand_ref = db.collection('brands').document(brand_id)
+            brand_doc = brand_ref.get()
+            if not brand_doc.exists:
+                raise HTTPException(status_code=404, detail=f"Brand with ID {brand_id} not found")
+            product_data['brand'] = brand_doc.to_dict()
+
+        # Fetch and replace category data if provided
+        if 'category' in product_data and product_data.get('category'):
+            category_id = product_data['category']['id']
+            category_ref = db.collection('categories').document(category_id)
+            category_doc = category_ref.get()
+            if not category_doc.exists:
+                raise HTTPException(status_code=404, detail=f"Category with ID {category_id} not found")
+            product_data['category'] = category_doc.to_dict()
+
         products_ref = db.collection('products')
 
         product_data['createdAt'] = firestore.firestore.SERVER_TIMESTAMP
@@ -171,11 +190,13 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
         db = get_firestore_client()
         products_ref = db.collection('products')
 
+        query = query.lower()  # Normalize query for case-insensitive search
+
         # Firestore doesn't support OR queries on different fields,
         # so we need to perform three separate queries and merge the results.
         name_query = products_ref.where('name', '>=', query).where('name', '<=', query + '\uf8ff').get()
-        brand_query = products_ref.where('brand', '>=', query).where('brand', '<=', query + '\uf8ff').get()
-        category_query = products_ref.where('category', '>=', query).where('category', '<=', query + '\uf8ff').get()
+        brand_query = products_ref.where('brand.name', '>=', query).where('brand.name', '<=', query + '\uf8ff').get()
+        category_query = products_ref.where('category.name', '>=', query).where('category.name', '<=', query + '\uf8ff').get()
 
         products = {}
         for doc in name_query:
@@ -251,8 +272,33 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
                 detail="Product not found"
             )
 
-        # Update only provided fields
         update_data = product_data.copy()
+
+        # Fetch and replace brand data if provided
+        if 'brand' in update_data:
+            if update_data.get('brand'):
+                brand_id = update_data['brand']['id']
+                brand_ref = db.collection('brands').document(brand_id)
+                brand_doc = brand_ref.get()
+                if not brand_doc.exists:
+                    raise HTTPException(status_code=404, detail=f"Brand with ID {brand_id} not found")
+                update_data['brand'] = brand_doc.to_dict()
+            else:  # handle case where brand is set to null
+                update_data['brand'] = None
+
+        # Fetch and replace category data if provided
+        if 'category' in update_data:
+            if update_data.get('category'):
+                category_id = update_data['category']['id']
+                category_ref = db.collection('categories').document(category_id)
+                category_doc = category_ref.get()
+                if not category_doc.exists:
+                    raise HTTPException(status_code=404, detail=f"Category with ID {category_id} not found")
+                update_data['category'] = category_doc.to_dict()
+            else:  # handle case where category is set to null
+                update_data['category_name_lower'] = None
+
+        # Update only provided fields
         update_data['updatedAt'] = firestore.firestore.SERVER_TIMESTAMP
         product_ref.update(update_data)
 
@@ -315,5 +361,6 @@ async def delete_product(product_id: str) -> bool:
     except Exception as exc:
         raise HTTPException(
             status_code=500,
+
             detail=f"Internal server error: {str(exc)}"
         )

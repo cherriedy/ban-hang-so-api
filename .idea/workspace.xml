@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add search functionality for products with pagination support">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor product search functionality to use a dedicated service and introduce a generic pagination response model">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -273,7 +271,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750357873687</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Refactor product search functionality to use a dedicated service and introduce a generic pagination response model">
+      <option name="closed" value="true" />
+      <created>1750358559789</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1750358559789</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -295,6 +301,7 @@
     <MESSAGE value="Refactor product service responses to include pagination and update price field to sellingPrice" />
     <MESSAGE value="Add product detail response model and update product retrieval endpoint" />
     <MESSAGE value="Add search functionality for products with pagination support" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add search functionality for products with pagination support" />
+    <MESSAGE value="Refactor product search functionality to use a dedicated service and introduce a generic pagination response model" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor product search functionality to use a dedicated service and introduce a generic pagination response model" />
   </component>
 </project>
