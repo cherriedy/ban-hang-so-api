@@ -7,7 +7,7 @@ from api.products.schemas import (
 )
 from api.products.services import (
     get_products, get_product_by_id, create_product,
-    update_product, delete_product
+    update_product, delete_product, search_products
 )
 
 router = APIRouter()
@@ -39,6 +39,38 @@ async def list_products(
 
         # Get products with pagination
         products_data = await get_products(limit, offset, sort_by, sort_order)
+        return JSendResponse.success(products_data)
+    except HTTPException as e:
+        return JSendResponse.error(
+            message=str(e.detail),
+            code=e.status_code
+        )
+    except Exception as e:
+        return JSendResponse.error(
+            message=str(e),
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@router.get("/search", response_model=JSendResponse[ProductsData])
+async def search_products(q: str = Query(..., description="Search query"),
+                          page: int = Query(1, ge=1, description="Page number"),
+                          size: int = Query(100, ge=1, le=1000, description="Items per page")):
+    """
+    Search for products by name, brand, or category.
+
+    Args:
+        q: The search query
+        page: The page number (starts at 1)
+        size: Number of products per page (max 1000)
+
+    Returns:
+        JSendResponse containing a list of matching products
+    """
+    try:
+        offset = (page - 1) * size
+        limit = size
+        products_data = await search_products(q, limit, offset)
         return JSendResponse.success(products_data)
     except HTTPException as e:
         return JSendResponse.error(

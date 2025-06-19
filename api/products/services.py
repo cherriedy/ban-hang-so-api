@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from fastapi import HTTPException
 from firebase_admin import firestore
 
@@ -134,9 +132,8 @@ async def create_product(product_data: dict) -> ProductInDB:
         db = get_firestore_client()
         products_ref = db.collection('products')
 
-        now = datetime.now(timezone.utc)
-        product_data['createdAt'] = now
-        product_data['updatedAt'] = now
+        product_data['createdAt'] = firestore.firestore.SERVER_TIMESTAMP
+        product_data['updatedAt'] = firestore.firestore.SERVER_TIMESTAMP
 
         # Create new document
         new_product_ref = products_ref.document()
@@ -147,6 +144,73 @@ async def create_product(product_data: dict) -> ProductInDB:
         created_product['id'] = new_product_ref.id
 
         return ProductInDB(**created_product)
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def search_products(query: str, limit: int = 100, offset: int = 0) -> ProductsData:
+    """
+    Service function to search for products by name, brand, or category with pagination.
+
+    Args:
+        query: The search query
+        limit: Maximum number of products to return
+        offset: Number of products to skip
+
+    Returns:
+        ProductsData object containing the paginated search results
+
+    Raises:
+        HTTPException: If errors occur during search
+    """
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products')
+
+        # Firestore doesn't support OR queries on different fields,
+        # so we need to perform three separate queries and merge the results.
+        name_query = products_ref.where('name', '>=', query).where('name', '<=', query + '\uf8ff').get()
+        brand_query = products_ref.where('brand', '>=', query).where('brand', '<=', query + '\uf8ff').get()
+        category_query = products_ref.where('category', '>=', query).where('category', '<=', query + '\uf8ff').get()
+
+        products = {}
+        for doc in name_query:
+            product_data = doc.to_dict()
+            product_data['id'] = doc.id
+            products[doc.id] = ProductInDB(**product_data)
+
+        for doc in brand_query:
+            if doc.id not in products:
+                product_data = doc.to_dict()
+                product_data['id'] = doc.id
+                products[doc.id] = ProductInDB(**product_data)
+
+        for doc in category_query:
+            if doc.id not in products:
+                product_data = doc.to_dict()
+                product_data['id'] = doc.id
+                products[doc.id] = ProductInDB(**product_data)
+
+        all_results = list(products.values())
+        total = len(all_results)
+
+        # Apply pagination
+        paginated_results = all_results[offset:offset + limit]
+
+        page = offset // limit + 1
+        pages = (total + limit - 1) // limit if limit > 0 else 0
+
+        return ProductsData(
+            items=paginated_results,
+            total=total,
+            page=page,
+            size=limit,
+            pages=pages
+        )
 
     except Exception as exc:
         raise HTTPException(
@@ -189,7 +253,7 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
 
         # Update only provided fields
         update_data = product_data.copy()
-        update_data['updatedAt'] = datetime.now(timezone.utc)
+        update_data['updatedAt'] = firestore.firestore.SERVER_TIMESTAMP
         product_ref.update(update_data)
 
         # Return updated product

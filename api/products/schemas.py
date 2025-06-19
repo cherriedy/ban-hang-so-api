@@ -163,3 +163,5 @@ class ProductUpsert(BaseModel):
     avatarUrl: Optional[str] = None
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
+
+

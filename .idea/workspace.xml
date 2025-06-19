@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor product service responses to include pagination and update price field to sellingPrice">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add product detail response model and update product retrieval endpoint">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/routers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,21 +45,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python tests.Python tests in test_products.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.routers.executor&quot;: &quot;Run&quot;,
-    &quot;Python.schemas.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/cherriedyy/PycharmProjects/ban-hang-so-api&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests for test_products.test_get_product_by_id_success.executor": "Run",
+    "Python tests.Python tests in test_products.py.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.routers.executor": "Run",
+    "Python.schemas.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/cherriedyy/PycharmProjects/ban-hang-so-api",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -230,7 +234,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750260420509</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Add product detail response model and update product retrieval endpoint">
+      <option name="closed" value="true" />
+      <created>1750345371482</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1750345371482</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -250,6 +262,7 @@
     <MESSAGE value="Update product sorting logic to support ascending and descending order" />
     <MESSAGE value="Refactor product schemas and services to remove unused fields" />
     <MESSAGE value="Refactor product service responses to include pagination and update price field to sellingPrice" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor product service responses to include pagination and update price field to sellingPrice" />
+    <MESSAGE value="Add product detail response model and update product retrieval endpoint" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add product detail response model and update product retrieval endpoint" />
   </component>
 </project>
