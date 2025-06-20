@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements-dev.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements-dev.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -339,7 +337,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750360194289</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria">
+      <option name="closed" value="true" />
+      <created>1750361206265</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1750361206265</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -365,6 +371,7 @@
     <MESSAGE value="Fetch and replace brand and category data in product service; handle null cases" />
     <MESSAGE value="Refactor Firestore queries in product service to use named parameters for improved readability" />
     <MESSAGE value="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results" />
+    <MESSAGE value="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria" />
   </component>
 </project>

@@ -9,7 +9,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, TypeVar, Generic, List, Any, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+import re
 
 
 class StoreInUser(BaseModel):
@@ -28,6 +29,54 @@ class TimestampMixin:
     """
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
+
+    @field_validator('createdAt', 'updatedAt', mode='before')
+    @classmethod
+    def parse_datetime(cls, value):
+        """Parse various datetime formats including 'Apr 12, 2025 9:20:43 PM'"""
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        if isinstance(value, str):
+            # Handle the format "Apr 12, 2025 9:20:43 PM"
+            pattern = r"(\w+) (\d+), (\d+) (\d+):(\d+):(\d+) ([AP]M)"
+            match = re.match(pattern, value)
+            if match:
+                month_map = {
+                    "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+                    "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+                }
+                month_str, day, year, hour, minute, second, am_pm = match.groups()
+
+                month = month_map.get(month_str, 1)
+                day = int(day)
+                year = int(year)
+                hour = int(hour)
+                minute = int(minute)
+                second = int(second)
+
+                # Convert to 24-hour format
+                if am_pm == "PM" and hour < 12:
+                    hour += 12
+                elif am_pm == "AM" and hour == 12:
+                    hour = 0
+
+                return datetime(year, month, day, hour, minute, second)
+
+            # Try Python's default parser as a fallback
+            try:
+                return datetime.fromisoformat(value)
+            except ValueError:
+                try:
+                    return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    pass
+
+        # If we can't parse it, return as is and let Pydantic handle the validation error
+        return value
 
 
 class JSendStatus(str, Enum):
@@ -76,5 +125,3 @@ class JSendResponse(BaseModel, Generic[T]):
     def error(cls, message: str, code: Optional[int] = None, data: Any = None) -> 'JSendResponse':
         """Create an error response for system or unexpected errors"""
         return cls(status=JSendStatus.ERROR, message=message, code=code, data=data)
-
-
