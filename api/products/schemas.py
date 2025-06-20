@@ -5,7 +5,7 @@ These models are used for request and response validation and serialization.
 
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from api.common.schemas import TimestampMixin, PaginationResponse, JSendResponse
 
@@ -78,6 +78,20 @@ class ProductInDB(ProductBase, TimestampMixin):
     id: str
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
+
+    @field_validator('category', 'brand', mode='before')
+    @classmethod
+    def validate_category_and_brand(cls, value):
+        """Ensure category and brand have required fields or are set to None"""
+        if value is None:
+            return None
+
+        if isinstance(value, dict):
+            # If id is missing, return None instead of an incomplete object
+            if 'id' not in value:
+                return None
+
+        return value
 
 
 class ProductDetailData(BaseModel):

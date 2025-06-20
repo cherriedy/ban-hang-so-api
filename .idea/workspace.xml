@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add datetime parsing support in schemas; handle various formats including 'Apr 12, 2025 9:20:43 PM'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +69,7 @@
       <recent name="$PROJECT_DIR$/api" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_search.test_search_products_function">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ban-hang-so-api" />
       <option name="ENV_FILES" value="" />
@@ -139,9 +139,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python tests.Python tests for test_search.test_search_products_function" />
         <item itemvalue="Python tests.Python tests for test_search.test_search_endpoint" />
-        <item itemvalue="Python.main" />
         <item itemvalue="Python tests.Python tests for test_products.test_get_product_by_id_success" />
       </list>
     </recent_temporary>
@@ -345,7 +345,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750361206265</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Add datetime parsing support in schemas; handle various formats including 'Apr 12, 2025 9:20:43 PM'">
+      <option name="closed" value="true" />
+      <created>1750385845991</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1750385845991</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -372,6 +380,7 @@
     <MESSAGE value="Refactor Firestore queries in product service to use named parameters for improved readability" />
     <MESSAGE value="Enhance product search functionality to include description and SKU; implement relevance scoring for improved results" />
     <MESSAGE value="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enhance product search functionality by implementing client-side filtering and relevance scoring; include description and SKU in search criteria" />
+    <MESSAGE value="Add datetime parsing support in schemas; handle various formats including 'Apr 12, 2025 9:20:43 PM'" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add datetime parsing support in schemas; handle various formats including 'Apr 12, 2025 9:20:43 PM'" />
   </component>
 </project>
