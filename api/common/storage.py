@@ -99,12 +99,15 @@ async def upload_image(
             metadata["temporary"] = "true"
             metadata["upload_time"] = timestamp
 
-        # Upload the file with metadata
         blob.upload_from_string(
             contents,
-            content_type=content_type,
-            metadata=metadata
+            content_type=content_type
         )
+
+        # Set metadata after upload
+        if metadata:
+            blob.metadata = metadata
+            blob.patch()
 
         # Make the file public and get URL
         blob.make_public()
