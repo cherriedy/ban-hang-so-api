@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from firebase_admin import firestore
 
+from api.common.storage import mark_image_permanent
 from api.products.schemas import ProductInDB, ProductsData
 
 
@@ -161,6 +162,10 @@ async def create_product(product_data: dict) -> ProductInDB:
         # Retrieve the created product to return
         created_product = new_product_ref.get().to_dict()
         created_product['id'] = new_product_ref.id
+
+        # Mark uploaded image as permanent if one was provided
+        if product_data.get('avatarUrl'):
+            await mark_image_permanent(product_data['avatarUrl'])
 
         return ProductInDB(**created_product)
 
@@ -343,11 +348,15 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
                     raise HTTPException(status_code=404, detail=f"Category with ID {category_id} not found")
                 update_data['category'] = category_doc.to_dict()
             else:  # handle case where category is set to null
-                update_data['category_name_lower'] = None
+                update_data['category'] = None
 
         # Update only provided fields
         update_data['updatedAt'] = firestore.firestore.SERVER_TIMESTAMP
         product_ref.update(update_data)
+
+        # Mark uploaded image as permanent if a new one was provided
+        if update_data.get('avatarUrl'):
+            await mark_image_permanent(update_data['avatarUrl'])
 
         # Return updated product
         updated_product_dict = product_ref.get().to_dict()

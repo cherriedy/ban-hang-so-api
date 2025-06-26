@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Query, Path
+from fastapi import APIRouter, HTTPException, Query, Path, UploadFile, File, Form, Depends
 from starlette import status
 
 from api.common.schemas import JSendResponse
+from api.common.storage import upload_image
 from api.products.schemas import (
-    ProductInDB, ProductsData, ProductCreate, ProductUpdate, ProductDetailData
+    ProductInDB, ProductsData, ProductCreate, ProductUpdate, ProductDetailData,
 )
 from api.products.services import (
     get_products, get_product_by_id, create_product,
@@ -188,6 +189,39 @@ async def delete_existing_product(
     try:
         success = await delete_product(product_id)
         return JSendResponse.success(success)
+    except HTTPException as e:
+        return JSendResponse.error(
+            message=str(e.detail),
+            code=e.status_code
+        )
+    except Exception as e:
+        return JSendResponse.error(
+            message=str(e),
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@router.post("/upload-image", response_model=JSendResponse[str])
+async def upload_product_image(
+    file: UploadFile = File(..., description="Image file to upload"),
+    product_id: str = Form(None, description="Optional product ID to associate with the image"),
+    is_temporary: bool = Form(True, description="Whether this is a temporary upload pending form submission")
+):
+    """
+    Upload an image file for a product.
+
+    Args:
+        file: The image file to upload
+        product_id: Optional product ID to associate with the image
+        is_temporary: Whether this is a temporary upload (will be cleaned up if not used)
+
+    Returns:
+        JSendResponse containing the URL of the uploaded image as a string
+    """
+    try:
+        # Upload the image to Firebase Storage (default folder is 'products')
+        url = await upload_image(file, folder="products", file_id=product_id, is_temporary=is_temporary)
+        return JSendResponse.success(url)
     except HTTPException as e:
         return JSendResponse.error(
             message=str(e.detail),
