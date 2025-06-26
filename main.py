@@ -14,6 +14,13 @@ load_dotenv()
 # Fallback: Local JSON file (for local development)
 firebase_cred_json_content = os.environ.get('FIREBASE_CREDENTIALS_JSON_CONTENT')
 
+# Get Firebase Storage bucket name from environment variable
+firebase_storage_bucket = os.environ.get('FIREBASE_STORAGE_BUCKET')
+if not firebase_storage_bucket:
+    print("CRITICAL ERROR: FIREBASE_STORAGE_BUCKET environment variable is not set.")
+    print("Set FIREBASE_STORAGE_BUCKET to your Firebase Storage bucket name (e.g., 'your-app.appspot.com').")
+    raise RuntimeError("FIREBASE_STORAGE_BUCKET environment variable is required.")
+
 if firebase_cred_json_content:
     try:
         cred_dict = json.loads(firebase_cred_json_content)
@@ -45,7 +52,10 @@ else:
         print("The application will now exit.")
         raise
 
-firebase_admin.initialize_app(cred)
+# Pass storageBucket option to initialize_app
+firebase_admin.initialize_app(cred, {
+    'storageBucket': firebase_storage_bucket
+})
 
 app = FastAPI(title="Ban Hang So API")
 

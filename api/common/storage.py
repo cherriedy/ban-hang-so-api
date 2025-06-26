@@ -143,7 +143,6 @@ async def delete_image_by_url(url: str) -> bool:
             return False
 
         # Parse URL to get blob name
-        # URL format: https://storage.googleapis.com/BUCKET_NAME/PATH/TO/FILE
         url_parts = url.split("/")
         if len(url_parts) < 5:
             return False
