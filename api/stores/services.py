@@ -177,3 +177,4 @@ def save_store_service(user_id: str, store_data: CreateStoreRequest) -> CreateSt
             status_code=500,
             detail=f"Internal server error: {str(exc)}"
         )
+

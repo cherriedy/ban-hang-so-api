@@ -67,3 +67,4 @@ async def create_store(user_id: str, store_data: CreateStoreRequest):
             message=str(e),
             code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+

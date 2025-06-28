@@ -42,6 +42,7 @@ class ProductBase(BaseModel):
     stockQuantity: int = 0
     status: bool = True
     avatarUrl: Optional[str] = None
+    store_id: str  # Added store_id field
 
 
 class ProductCreate(ProductBase):
@@ -69,6 +70,7 @@ class ProductUpdate(BaseModel):
     avatarUrl: Optional[str] = None
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
+    store_id: Optional[str] = None  # Added store_id field
 
 
 class ProductInDB(ProductBase, TimestampMixin):
@@ -164,3 +166,4 @@ class ProductUpsert(BaseModel):
     avatarUrl: Optional[str] = None
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
+    store_id: Optional[str] = None  # Added store_id field

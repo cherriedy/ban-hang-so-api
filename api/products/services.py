@@ -9,12 +9,13 @@ def get_firestore_client():
     return firestore.client()
 
 
-async def get_products(limit: int = 100, offset: int = 0,
+async def get_products(store_id: str, limit: int = 100, offset: int = 0,
                        sort_by: str = "createdAt", sort_order: str = "desc") -> ProductsData:
     """
-    Service function to retrieve products with pagination and sorting.
+    Service function to retrieve products with pagination and sorting for a specific store.
 
     Args:
+        store_id: The ID of the store to retrieve products from
         limit: Maximum number of products to return
         offset: Number of products to skip
         sort_by: Field to sort by
@@ -26,9 +27,15 @@ async def get_products(limit: int = 100, offset: int = 0,
     Raises:
         HTTPException: If errors occur during retrieval
     """
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
+        )
+
     try:
         db = get_firestore_client()
-        products_ref = db.collection('products')
+        products_ref = db.collection('products').where('store_id', '==', store_id)
 
         # Count total products for pagination info
         total_query = products_ref.count()
@@ -71,12 +78,13 @@ async def get_products(limit: int = 100, offset: int = 0,
         )
 
 
-async def get_product_by_id(product_id: str) -> ProductInDB:
+async def get_product_by_id(product_id: str, store_id: str) -> ProductInDB:
     """
-    Service function to retrieve a single product by ID.
+    Service function to retrieve a single product by ID within a specific store.
 
     Args:
         product_id: The unique identifier of the product
+        store_id: The ID of the store the product belongs to
 
     Returns:
         ProductInDB object containing the product data
@@ -88,6 +96,12 @@ async def get_product_by_id(product_id: str) -> ProductInDB:
         raise HTTPException(
             status_code=400,
             detail="Missing product ID parameter"
+        )
+
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
         )
 
     try:
@@ -103,6 +117,14 @@ async def get_product_by_id(product_id: str) -> ProductInDB:
             )
 
         product_data = doc.to_dict()
+
+        # Verify the product belongs to the specified store
+        if product_data.get('store_id') != store_id:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found in the specified store"
+            )
+
         product_data['id'] = doc.id
         return ProductInDB(**product_data)
 
@@ -116,12 +138,13 @@ async def get_product_by_id(product_id: str) -> ProductInDB:
         )
 
 
-async def create_product(product_data: dict) -> ProductInDB:
+async def create_product(product_data: dict, store_id: str) -> ProductInDB:
     """
-    Service function to create a new product.
+    Service function to create a new product in a specific store.
 
     Args:
         product_data: The product data to create
+        store_id: The ID of the store to create the product in
 
     Returns:
         ProductInDB object containing the created product data
@@ -129,8 +152,26 @@ async def create_product(product_data: dict) -> ProductInDB:
     Raises:
         HTTPException: If errors occur during creation
     """
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
+        )
+
     try:
         db = get_firestore_client()
+
+        # Verify store exists
+        store_ref = db.collection('stores').document(store_id)
+        store_doc = store_ref.get()
+        if not store_doc.exists:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Store with ID {store_id} not found"
+            )
+
+        # Ensure store_id is set in product data
+        product_data['store_id'] = store_id
 
         # Fetch and replace brand data if provided
         if 'brand' in product_data and product_data.get('brand'):
@@ -169,6 +210,9 @@ async def create_product(product_data: dict) -> ProductInDB:
 
         return ProductInDB(**created_product)
 
+    except HTTPException:
+        # Re-raise HTTP exceptions to preserve status code and detail
+        raise
     except Exception as exc:
         raise HTTPException(
             status_code=500,
@@ -176,12 +220,13 @@ async def create_product(product_data: dict) -> ProductInDB:
         )
 
 
-async def search_products(query: str, limit: int = 100, offset: int = 0) -> ProductsData:
+async def search_products(query: str, store_id: str, limit: int = 100, offset: int = 0) -> ProductsData:
     """
-    Service function to search for products by name, brand, category, description or SKU with pagination.
+    Service function to search for products by name, brand, category, description or SKU with pagination within a specific store.
 
     Args:
         query: The search query
+        store_id: The ID of the store to search products in
         limit: Maximum number of products to return
         offset: Number of products to skip
 
@@ -191,20 +236,26 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
     Raises:
         HTTPException: If errors occur during search
     """
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
+        )
+
     try:
         db = get_firestore_client()
-        products_ref = db.collection('products')
+        products_ref = db.collection('products').where('store_id', '==', store_id)
 
-        # If query is empty, return all products instead of searching
+        # If query is empty, return all products for the store instead of searching
         if not query or query.strip() == "":
-            return await get_products(limit=limit, offset=offset)
+            return await get_products(store_id=store_id, limit=limit, offset=offset)
 
         query = query.lower().strip()  # Normalize query for case-insensitive search
 
         # Dictionary to store all found products with their relevance score
         products = {}
 
-        # Fetch all products and perform client-side filtering
+        # Fetch all products for the store and perform client-side filtering
         # This approach allows searching for substrings anywhere in the fields
         all_products = products_ref.get()
 
@@ -292,13 +343,14 @@ async def search_products(query: str, limit: int = 100, offset: int = 0) -> Prod
         )
 
 
-async def update_product(product_id: str, product_data: dict) -> ProductInDB:
+async def update_product(product_id: str, product_data: dict, store_id: str) -> ProductInDB:
     """
-    Service function to update an existing product.
+    Service function to update an existing product within a specific store.
 
     Args:
         product_id: The unique identifier of the product to update
         product_data: The product data to update
+        store_id: The ID of the store the product belongs to
 
     Returns:
         ProductInDB object containing the updated product data
@@ -310,6 +362,12 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
         raise HTTPException(
             status_code=400,
             detail="Missing product ID parameter"
+        )
+
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
         )
 
     try:
@@ -324,7 +382,23 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
                 detail="Product not found"
             )
 
+        existing_product_data = product.to_dict()
+
+        # Verify the product belongs to the specified store
+        if existing_product_data.get('store_id') != store_id:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found in the specified store"
+            )
+
         update_data = product_data.copy()
+
+        # Ensure store_id cannot be changed
+        if 'store_id' in update_data and update_data['store_id'] != store_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot change store_id of existing product"
+            )
 
         # Fetch and replace brand data if provided
         if 'brand' in update_data:
@@ -377,12 +451,13 @@ async def update_product(product_id: str, product_data: dict) -> ProductInDB:
         )
 
 
-async def delete_product(product_id: str) -> bool:
+async def delete_product(product_id: str, store_id: str) -> bool:
     """
-    Service function to delete a product by ID.
+    Service function to delete a product by ID within a specific store.
 
     Args:
         product_id: The unique identifier of the product to delete
+        store_id: The ID of the store the product belongs to
 
     Returns:
         bool: True if the product was deleted successfully
@@ -394,6 +469,12 @@ async def delete_product(product_id: str) -> bool:
         raise HTTPException(
             status_code=400,
             detail="Missing product ID parameter"
+        )
+
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
         )
 
     try:
@@ -408,6 +489,16 @@ async def delete_product(product_id: str) -> bool:
                 detail="Product not found"
             )
 
+        product_data = product.to_dict()
+
+        # Verify the product belongs to the specified store
+        if product_data.get('store_id') != store_id:
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found in the specified store"
+            )
+
+        # Delete the product
         product_ref.delete()
         return True
 
@@ -417,6 +508,5 @@ async def delete_product(product_id: str) -> bool:
     except Exception as exc:
         raise HTTPException(
             status_code=500,
-
             detail=f"Internal server error: {str(exc)}"
         )

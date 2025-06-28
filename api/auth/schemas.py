@@ -5,6 +5,7 @@ These models are used for request and response validation and serialization.
 
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
+from datetime import datetime
 
 from api.common.schemas import JSendResponse, TimestampMixin
 
@@ -17,6 +18,15 @@ class StoreInUser(BaseModel):
     role: str
 
 
+class StoreInfo(BaseModel):
+    """
+    Represents store information for signup process.
+    """
+    name: str
+    description: str
+    imageUrl: Optional[str] = None
+
+
 class UserSignup(BaseModel):
     """
     Represents the request data for signing up a new user.
@@ -26,6 +36,9 @@ class UserSignup(BaseModel):
     displayName: Optional[str] = None
     phone: Optional[str] = None
     imageUrl: Optional[str] = None
+    role: str = Field(..., description="User role: 'owner' or 'staff'")
+    storeInfo: Optional[StoreInfo] = Field(None, description="Store information for owner role")
+    storeId: Optional[str] = Field(None, description="Store ID for staff role")
 
 
 class UserBase(BaseModel, TimestampMixin):
@@ -37,6 +50,8 @@ class UserBase(BaseModel, TimestampMixin):
     phone: Optional[str] = None
     imageUrl: Optional[str] = None
     stores: List[StoreInUser] = []
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
 
 
 class UserResponse(JSendResponse[UserBase]):
