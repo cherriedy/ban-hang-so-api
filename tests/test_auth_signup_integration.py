@@ -160,7 +160,9 @@ class TestSignupEndpoint:
 
         response = client.post("/auth/signup", json=payload)
         assert response.status_code == 400
-        assert "Role must be either 'owner' or 'staff'" in response.json()["detail"]
+        data = response.json()
+        assert data["status"] == "error"
+        assert "Role must be either 'owner' or 'staff'" in data["message"]
 
     def test_signup_owner_missing_store_info_400(self, client):
         """Test owner signup without store info returns 400."""
@@ -173,7 +175,9 @@ class TestSignupEndpoint:
 
         response = client.post("/auth/signup", json=payload)
         assert response.status_code == 400
-        assert "Store information is required for owner role" in response.json()["detail"]
+        data = response.json()
+        assert data["status"] == "error"
+        assert "Store information is required for owner role" in data["message"]
 
     def test_signup_staff_missing_store_id_400(self, client):
         """Test staff signup without store ID returns 400."""
@@ -186,7 +190,9 @@ class TestSignupEndpoint:
 
         response = client.post("/auth/signup", json=payload)
         assert response.status_code == 400
-        assert "Store ID is required for staff role" in response.json()["detail"]
+        data = response.json()
+        assert data["status"] == "error"
+        assert "Store ID is required for staff role" in data["message"]
 
     def test_signup_staff_nonexistent_store_400(self, client, staff_signup_payload):
         """Test staff signup with nonexistent store returns 400."""
@@ -201,7 +207,9 @@ class TestSignupEndpoint:
 
             response = client.post("/auth/signup", json=staff_signup_payload)
             assert response.status_code == 400
-            assert "does not exist" in response.json()["detail"]
+            data = response.json()
+            assert data["status"] == "error"
+            assert "does not exist" in data["message"]
 
     def test_signup_invalid_email_422(self, client):
         """Test signup with invalid email returns 422."""
@@ -250,7 +258,9 @@ class TestSignupEndpoint:
 
             response = client.post("/auth/signup", json=owner_signup_payload)
             assert response.status_code == 400
-            assert "Firebase Auth error" in response.json()["detail"]
+            data = response.json()
+            assert data["status"] == "error"
+            assert "Firebase Auth error" in data["message"]
 
     def test_signup_firestore_error_400(self, client, owner_signup_payload):
         """Test signup when Firestore fails returns 400."""
@@ -267,7 +277,9 @@ class TestSignupEndpoint:
 
             response = client.post("/auth/signup", json=owner_signup_payload)
             assert response.status_code == 400
-            assert "Firestore error" in response.json()["detail"]
+            data = response.json()
+            assert data["status"] == "error"
+            assert "Firestore error" in data["message"]
 
             # Verify rollback was attempted
             mock_auth.delete_user.assert_called_once_with("test_user_id")
