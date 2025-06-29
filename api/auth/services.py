@@ -27,12 +27,15 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
                 raise ValueError(f"Store with ID {user_data.storeId} does not exist")
 
         # Create user in Firebase Auth
-        user_record = auth.create_user(
-            email=user_data.email,
-            password=user_data.password,
-            display_name=user_data.displayName,
-            photo_url=user_data.imageUrl
-        )
+        try:
+            user_record = auth.create_user(
+                email=user_data.email,
+                password=user_data.password,
+                display_name=user_data.displayName,
+                photo_url=user_data.imageUrl
+            )
+        except auth.EmailAlreadyExistsError:
+            return UserResponse.error("Email is already in use.", code=409)
 
         # Handle store creation/assignment based on role
         stores_list = []
