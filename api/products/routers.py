@@ -137,7 +137,7 @@ async def get_product(
 
 
 @router.post("", response_model=JSendResponse[ProductInDB])
-async def create_new_product(
+async def create_product_endpoint(
     product_data: ProductCreate,
     user_id: str = Depends(get_current_user_id)
 ):
@@ -145,7 +145,7 @@ async def create_new_product(
     Create a new product in a specific store.
 
     Args:
-        product_data: The product data to create (including store_id)
+        product_data: The product data to create (including storeId)
         user_id: Authenticated user ID (injected)
 
     Returns:
@@ -155,11 +155,11 @@ async def create_new_product(
         # Filter out None values to avoid overwriting with nulls
         data = {k: v for k, v in product_data.model_dump().items() if v is not None}
 
-        # Extract store_id from the product data
-        store_id = data.get('store_id')
+        # Extract storeId from the product data
+        store_id = data.get('storeId')
         if not store_id:
             return JSendResponse.error(
-                message="store_id is required",
+                message="storeId is required",
                 code=status.HTTP_400_BAD_REQUEST
             )
 

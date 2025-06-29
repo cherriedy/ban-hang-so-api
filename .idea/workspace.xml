@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Convert Firestore timestamps to Python datetime objects in user response">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Handle email already in use error during user creation in Firebase Auth">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/routers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,26 +45,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python tests.Python tests for test_auth_dependencies.TestAuthDependencies.test_get_current_user_id_success.executor": "Run",
-    "Python tests.Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup.executor": "Run",
-    "Python tests.Python tests for test_products.test_get_product_by_id_success.executor": "Run",
-    "Python tests.Python tests for test_search.test_search_endpoint.executor": "Run",
-    "Python tests.Python tests for test_search.test_search_products_function.executor": "Run",
-    "Python tests.Python tests in test_products.py.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.routers.executor": "Run",
-    "Python.schemas.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/cherriedyy/PycharmProjects/ban-hang-so-api",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python tests.Python tests for test_auth_dependencies.TestAuthDependencies.test_get_current_user_id_success.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_products.test_get_product_by_id_success.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_search.test_search_endpoint.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for test_search.test_search_products_function.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_products.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.routers.executor&quot;: &quot;Run&quot;,
+    &quot;Python.schemas.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/cherriedyy/PycharmProjects/ban-hang-so-api&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -439,7 +437,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751176048925</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Refactor user response to include user ID and serialize timestamps to ISO format">
+      <option name="closed" value="true" />
+      <created>1751181365076</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1751181365076</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Handle email already in use error during user creation in Firebase Auth">
+      <option name="closed" value="true" />
+      <created>1751183713197</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1751183713197</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -454,8 +468,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Refactor TimestampMixin to remove inheritance from BaseModel" />
-    <MESSAGE value="Refactor UserResponse schema to inherit from BaseModel and clean up services.py" />
     <MESSAGE value="Refactor user stores retrieval to return a list of UserStore objects directly and update related service function" />
     <MESSAGE value="Fix user stores retrieval to return a list directly without awaiting the service call" />
     <MESSAGE value="Add JSend response format and update user store retrieval and creation endpoints" />
@@ -479,6 +491,8 @@
     <MESSAGE value="Refactor signup error handling to return JSend format responses for better consistency" />
     <MESSAGE value="Refactor signup endpoint to return JSend format responses for improved consistency" />
     <MESSAGE value="Convert Firestore timestamps to Python datetime objects in user response" />
-    <option name="LAST_COMMIT_MESSAGE" value="Convert Firestore timestamps to Python datetime objects in user response" />
+    <MESSAGE value="Refactor user response to include user ID and serialize timestamps to ISO format" />
+    <MESSAGE value="Handle email already in use error during user creation in Firebase Auth" />
+    <option name="LAST_COMMIT_MESSAGE" value="Handle email already in use error during user creation in Firebase Auth" />
   </component>
 </project>

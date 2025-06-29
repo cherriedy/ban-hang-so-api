@@ -35,7 +35,7 @@ async def get_products(store_id: str, limit: int = 100, offset: int = 0,
 
     try:
         db = get_firestore_client()
-        products_ref = db.collection('products').where('store_id', '==', store_id)
+        products_ref = db.collection('products').where('storeId', '==', store_id)
 
         # Count total products for pagination info
         total_query = products_ref.count()
@@ -119,7 +119,7 @@ async def get_product_by_id(product_id: str, store_id: str) -> ProductInDB:
         product_data = doc.to_dict()
 
         # Verify the product belongs to the specified store
-        if product_data.get('store_id') != store_id:
+        if product_data.get('storeId') != store_id:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found in the specified store"
@@ -143,7 +143,7 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
     Service function to create a new product in a specific store.
 
     Args:
-        product_data: The product data to create
+        product_data: The product data to create (contains storeId from API)
         store_id: The ID of the store to create the product in
 
     Returns:
@@ -170,8 +170,9 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
                 detail=f"Store with ID {store_id} not found"
             )
 
-        # Ensure store_id is set in product data
-        product_data['store_id'] = store_id
+        # Set storeId field for database (no mapping needed since database also uses storeId)
+        if 'storeId' not in product_data:
+            product_data['storeId'] = store_id
 
         # Fetch and replace brand data if provided
         if 'brand' in product_data and product_data.get('brand'):
@@ -180,7 +181,12 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
             brand_doc = brand_ref.get()
             if not brand_doc.exists:
                 raise HTTPException(status_code=404, detail=f"Brand with ID {brand_id} not found")
-            product_data['brand'] = brand_doc.to_dict()
+
+            brand_data = brand_doc.to_dict()
+            # Verify brand belongs to the same store
+            if brand_data.get('storeId') != store_id:
+                raise HTTPException(status_code=400, detail=f"Brand does not belong to store {store_id}")
+            product_data['brand'] = brand_data
 
         # Fetch and replace category data if provided
         if 'category' in product_data and product_data.get('category'):
@@ -189,7 +195,12 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
             category_doc = category_ref.get()
             if not category_doc.exists:
                 raise HTTPException(status_code=404, detail=f"Category with ID {category_id} not found")
-            product_data['category'] = category_doc.to_dict()
+
+            category_data = category_doc.to_dict()
+            # Verify category belongs to the same store
+            if category_data.get('storeId') != store_id:
+                raise HTTPException(status_code=400, detail=f"Category does not belong to store {store_id}")
+            product_data['category'] = category_data
 
         products_ref = db.collection('products')
 
@@ -244,7 +255,7 @@ async def search_products(query: str, store_id: str, limit: int = 100, offset: i
 
     try:
         db = get_firestore_client()
-        products_ref = db.collection('products').where('store_id', '==', store_id)
+        products_ref = db.collection('products').where('storeId', '==', store_id)
 
         # If query is empty, return all products for the store instead of searching
         if not query or query.strip() == "":
@@ -349,7 +360,7 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
 
     Args:
         product_id: The unique identifier of the product to update
-        product_data: The product data to update
+        product_data: The product data to update (may contain storeId from API)
         store_id: The ID of the store the product belongs to
 
     Returns:
@@ -385,13 +396,23 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
         existing_product_data = product.to_dict()
 
         # Verify the product belongs to the specified store
-        if existing_product_data.get('store_id') != store_id:
+        if existing_product_data.get('storeId') != store_id:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found in the specified store"
             )
 
         update_data = product_data.copy()
+
+        # Prevent changing storeId if present in update data
+        if 'storeId' in update_data:
+            if update_data['storeId'] != store_id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot change storeId of existing product"
+                )
+            # Remove storeId from update_data as we don't want to update it
+            update_data.pop('storeId')
 
         # Ensure store_id cannot be changed
         if 'store_id' in update_data and update_data['store_id'] != store_id:
@@ -408,7 +429,12 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
                 brand_doc = brand_ref.get()
                 if not brand_doc.exists:
                     raise HTTPException(status_code=404, detail=f"Brand with ID {brand_id} not found")
-                update_data['brand'] = brand_doc.to_dict()
+
+                brand_data = brand_doc.to_dict()
+                # Verify brand belongs to the same store
+                if brand_data.get('storeId') != store_id:
+                    raise HTTPException(status_code=400, detail=f"Brand does not belong to store {store_id}")
+                update_data['brand'] = brand_data
             else:  # handle case where brand is set to null
                 update_data['brand'] = None
 
@@ -420,7 +446,12 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
                 category_doc = category_ref.get()
                 if not category_doc.exists:
                     raise HTTPException(status_code=404, detail=f"Category with ID {category_id} not found")
-                update_data['category'] = category_doc.to_dict()
+
+                category_data = category_doc.to_dict()
+                # Verify category belongs to the same store
+                if category_data.get('storeId') != store_id:
+                    raise HTTPException(status_code=400, detail=f"Category does not belong to store {store_id}")
+                update_data['category'] = category_data
             else:  # handle case where category is set to null
                 update_data['category'] = None
 
@@ -492,7 +523,7 @@ async def delete_product(product_id: str, store_id: str) -> bool:
         product_data = product.to_dict()
 
         # Verify the product belongs to the specified store
-        if product_data.get('store_id') != store_id:
+        if product_data.get('storeId') != store_id:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found in the specified store"
