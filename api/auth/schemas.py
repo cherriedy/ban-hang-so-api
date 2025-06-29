@@ -4,10 +4,10 @@ These models are used for request and response validation and serialization.
 """
 
 from typing import Optional, List
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_serializer
 from datetime import datetime
 
-from api.common.schemas import JSendResponse, TimestampMixin
+from api.common.schemas import JSendResponse
 
 
 class StoreInUser(BaseModel):
@@ -41,10 +41,11 @@ class UserSignup(BaseModel):
     storeId: Optional[str] = Field(None, description="Store ID for staff role")
 
 
-class UserBase(BaseModel, TimestampMixin):
+class UserBase(BaseModel):
     """
     Common user fields returned in responses.
     """
+    id: str
     email: str
     contactName: Optional[str] = None
     phone: Optional[str] = None
@@ -52,6 +53,11 @@ class UserBase(BaseModel, TimestampMixin):
     stores: List[StoreInUser] = []
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
+
+    @field_serializer('createdAt', 'updatedAt')
+    def serialize_datetime(self, value: Optional[datetime]) -> Optional[str]:
+        """Serialize datetime to ISO format string."""
+        return value.isoformat() if value else None
 
 
 class UserResponse(JSendResponse[UserBase]):

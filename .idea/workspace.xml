@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor signup endpoint to return JSend format responses for improved consistency">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Convert Firestore timestamps to Python datetime objects in user response">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/auth/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +51,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python tests.Python tests for test_auth_dependencies.TestAuthDependencies.test_get_current_user_id_success.executor": "Run",
+    "Python tests.Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup.executor": "Run",
     "Python tests.Python tests for test_products.test_get_product_by_id_success.executor": "Run",
     "Python tests.Python tests for test_search.test_search_endpoint.executor": "Run",
     "Python tests.Python tests for test_search.test_search_products_function.executor": "Run",
@@ -70,7 +75,7 @@
       <recent name="$PROJECT_DIR$/api" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_auth_dependencies.TestAuthDependencies.test_get_current_user_id_success">
+  <component name="RunManager" selected="Python tests.Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ban-hang-so-api" />
       <option name="ENV_FILES" value="" />
@@ -108,7 +113,7 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for test_products.test_get_product_by_id_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="ban-hang-so-api" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -119,7 +124,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_products.test_get_product_by_id_success&quot;" />
+      <option name="_new_target" value="&quot;test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -155,11 +160,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_auth_signup_integration.TestSignupEndpoint.test_staff_signup_rollback_no_store_cleanup" />
         <item itemvalue="Python tests.Python tests for test_auth_dependencies.TestAuthDependencies.test_get_current_user_id_success" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python tests.Python tests for test_search.test_search_products_function" />
         <item itemvalue="Python tests.Python tests for test_search.test_search_endpoint" />
-        <item itemvalue="Python tests.Python tests for test_products.test_get_product_by_id_success" />
       </list>
     </recent_temporary>
   </component>
@@ -426,7 +431,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751175503838</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Convert Firestore timestamps to Python datetime objects in user response">
+      <option name="closed" value="true" />
+      <created>1751176048925</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1751176048925</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -441,7 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Refactor UserResponse schema to remove unnecessary inheritance and clean up imports in services.py" />
     <MESSAGE value="Refactor TimestampMixin to remove inheritance from BaseModel" />
     <MESSAGE value="Refactor UserResponse schema to inherit from BaseModel and clean up services.py" />
     <MESSAGE value="Refactor user stores retrieval to return a list of UserStore objects directly and update related service function" />
@@ -466,6 +478,7 @@
     <MESSAGE value="Add store_id field to product schemas and implement store-based authorization in product endpoints" />
     <MESSAGE value="Refactor signup error handling to return JSend format responses for better consistency" />
     <MESSAGE value="Refactor signup endpoint to return JSend format responses for improved consistency" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor signup endpoint to return JSend format responses for improved consistency" />
+    <MESSAGE value="Convert Firestore timestamps to Python datetime objects in user response" />
+    <option name="LAST_COMMIT_MESSAGE" value="Convert Firestore timestamps to Python datetime objects in user response" />
   </component>
 </project>

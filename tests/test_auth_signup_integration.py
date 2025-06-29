@@ -49,11 +49,22 @@ class TestSignupEndpoint:
             mock_user_record.uid = "test_user_id"
             mock_auth.create_user.return_value = mock_user_record
             
-            # Mock store creation
+            # Mock Firestore timestamp objects
+            mock_created_at = MagicMock()
+            mock_created_at.timestamp.return_value = datetime.now().timestamp()
+            mock_updated_at = MagicMock()
+            mock_updated_at.timestamp.return_value = datetime.now().timestamp()
+
+            # Create separate mocks for stores and users collections
+            mock_stores_collection = MagicMock()
+            mock_users_collection = MagicMock()
+
+            # Mock store document and operations
             mock_store_ref = MagicMock()
             mock_store_ref.id = "store_123"
-            
-            # Mock user document
+            mock_stores_collection.document.return_value = mock_store_ref
+
+            # Mock user document and operations
             mock_user_ref = MagicMock()
             mock_user_doc = MagicMock()
             mock_user_doc.exists = True
@@ -62,32 +73,38 @@ class TestSignupEndpoint:
                 "contactName": "Store Owner",
                 "phone": "1234567890",
                 "imageUrl": "https://example.com/image.jpg",
-                "createdAt": datetime.now(),
-                "updatedAt": datetime.now(),
+                "createdAt": mock_created_at,
+                "updatedAt": mock_updated_at,
                 "stores": [{"id": "store_123", "role": "ADMIN"}]
             }
             mock_user_ref.get.return_value = mock_user_doc
-            
+            mock_users_collection.document.return_value = mock_user_ref
+
+            # Set up the collection mock to return the appropriate collection
             def collection_side_effect(collection_name):
                 if collection_name == 'stores':
-                    stores_collection = MagicMock()
-                    stores_collection.document.return_value = mock_store_ref
-                    return stores_collection
+                    return mock_stores_collection
                 elif collection_name == 'users':
-                    users_collection = MagicMock()
-                    users_collection.document.return_value = mock_user_ref
-                    return users_collection
-            
+                    return mock_users_collection
+                else:
+                    return MagicMock()
+
             mock_db.collection.side_effect = collection_side_effect
 
             # Make API call
             response = client.post("/auth/signup", json=owner_signup_payload)
+
+            # Debug output if test fails
+            if response.status_code != 201:
+                print(f"\nActual response: {response.status_code}")
+                print(f"Response content: {response.json()}")
 
             # Assertions
             assert response.status_code == 201
             data = response.json()
             
             assert data["status"] == "success"
+            assert data["data"]["id"] == "test_user_id"
             assert data["data"]["email"] == "owner@example.com"
             assert data["data"]["contactName"] == "Store Owner"
             assert len(data["data"]["stores"]) == 1
@@ -110,6 +127,12 @@ class TestSignupEndpoint:
             mock_store_doc.exists = True
             mock_store_ref.get.return_value = mock_store_doc
             
+            # Mock Firestore timestamp objects
+            mock_created_at = MagicMock()
+            mock_created_at.timestamp.return_value = datetime.now().timestamp()
+            mock_updated_at = MagicMock()
+            mock_updated_at.timestamp.return_value = datetime.now().timestamp()
+
             # Mock user document
             mock_user_ref = MagicMock()
             mock_user_doc = MagicMock()
@@ -118,8 +141,8 @@ class TestSignupEndpoint:
                 "email": "staff@example.com",
                 "contactName": "Staff Member",
                 "phone": "0987654321",
-                "createdAt": datetime.now(),
-                "updatedAt": datetime.now(),
+                "createdAt": mock_created_at,  # Use mock Firestore timestamp
+                "updatedAt": mock_updated_at,  # Use mock Firestore timestamp
                 "stores": [{"id": "existing_store_id", "role": "STAFF"}]
             }
             mock_user_ref.get.return_value = mock_user_doc
@@ -144,6 +167,7 @@ class TestSignupEndpoint:
             data = response.json()
             
             assert data["status"] == "success"
+            assert data["data"]["id"] == "test_user_id"  # Check user ID is included
             assert data["data"]["email"] == "staff@example.com"
             assert data["data"]["contactName"] == "Staff Member"
             assert len(data["data"]["stores"]) == 1
@@ -284,6 +308,91 @@ class TestSignupEndpoint:
             # Verify rollback was attempted
             mock_auth.delete_user.assert_called_once_with("test_user_id")
 
+    def test_signup_firestore_error_with_rollback_verification(self, client, owner_signup_payload):
+        """Test that rollback properly cleans up Firebase Auth and store when Firestore fails."""
+        with patch('api.auth.services.auth') as mock_auth, \
+             patch('api.auth.services.db') as mock_db:
+
+            mock_user_record = MagicMock()
+            mock_user_record.uid = "test_user_id"
+            mock_auth.create_user.return_value = mock_user_record
+            mock_auth.delete_user = MagicMock()  # For rollback verification
+
+            # Mock store creation success
+            mock_store_ref = MagicMock()
+            mock_store_ref.id = "store_123"
+            mock_store_ref.delete = MagicMock()  # For rollback verification
+
+            # Mock user document creation failure
+            mock_user_ref = MagicMock()
+            mock_user_ref.set.side_effect = Exception("Firestore user creation failed")
+
+            def collection_side_effect(collection_name):
+                if collection_name == 'stores':
+                    stores_collection = MagicMock()
+                    stores_collection.document.return_value = mock_store_ref
+                    return stores_collection
+                elif collection_name == 'users':
+                    users_collection = MagicMock()
+                    users_collection.document.return_value = mock_user_ref
+                    return users_collection
+
+            mock_db.collection.side_effect = collection_side_effect
+
+            response = client.post("/auth/signup", json=owner_signup_payload)
+
+            # Verify error response
+            assert response.status_code == 400
+            data = response.json()
+            assert data["status"] == "error"
+            assert "Firestore user creation failed" in data["message"]
+
+            # Verify rollback operations were called
+            mock_auth.delete_user.assert_called_once_with("test_user_id")
+            mock_store_ref.delete.assert_called_once()  # Store should be rolled back for owner
+
+    def test_staff_signup_rollback_no_store_cleanup(self, client, staff_signup_payload):
+        """Test that staff signup rollback only cleans up Firebase Auth, not store."""
+        with patch('api.auth.services.auth') as mock_auth, \
+             patch('api.auth.services.db') as mock_db:
+
+            mock_user_record = MagicMock()
+            mock_user_record.uid = "test_user_id"
+            mock_auth.create_user.return_value = mock_user_record
+            mock_auth.delete_user = MagicMock()
+
+            # Mock existing store (should not be deleted)
+            mock_store_ref = MagicMock()
+            mock_store_doc = MagicMock()
+            mock_store_doc.exists = True
+            mock_store_ref.get.return_value = mock_store_doc
+            mock_store_ref.delete = MagicMock()
+
+            # Mock user document creation failure
+            mock_user_ref = MagicMock()
+            mock_user_ref.set.side_effect = Exception("Firestore error")
+
+            def collection_side_effect(collection_name):
+                if collection_name == 'stores':
+                    stores_collection = MagicMock()
+                    stores_collection.document.return_value = mock_store_ref
+                    return stores_collection
+                elif collection_name == 'users':
+                    users_collection = MagicMock()
+                    users_collection.document.return_value = mock_user_ref
+                    return users_collection
+
+            mock_db.collection.side_effect = collection_side_effect
+
+            response = client.post("/auth/signup", json=staff_signup_payload)
+
+            # Verify error response
+            assert response.status_code == 400
+
+            # Verify only Firebase Auth was rolled back (not the existing store)
+            mock_auth.delete_user.assert_called_once_with("test_user_id")
+            mock_store_ref.delete.assert_not_called()  # Store should NOT be deleted for staff
+
     def test_signup_store_info_validation(self, client):
         """Test store info validation for owner signup."""
         # Test missing store name
@@ -334,6 +443,12 @@ class TestSignupEndpoint:
             mock_user_record.uid = "test_user_id"
             mock_auth.create_user.return_value = mock_user_record
             
+            # Mock Firestore timestamp objects
+            mock_created_at = MagicMock()
+            mock_created_at.timestamp.return_value = datetime.now().timestamp()
+            mock_updated_at = MagicMock()
+            mock_updated_at.timestamp.return_value = datetime.now().timestamp()
+
             # Mock successful store and user creation
             mock_store_ref = MagicMock()
             mock_store_ref.id = "store_123"
@@ -345,8 +460,8 @@ class TestSignupEndpoint:
                 "contactName": None,
                 "phone": None,
                 "imageUrl": None,
-                "createdAt": datetime.now(),
-                "updatedAt": datetime.now(),
+                "createdAt": mock_created_at,  # Use mock Firestore timestamp
+                "updatedAt": mock_updated_at,  # Use mock Firestore timestamp
                 "stores": [{"id": "store_123", "role": "ADMIN"}]
             }
             mock_user_ref.get.return_value = mock_user_doc
@@ -372,3 +487,4 @@ class TestSignupEndpoint:
             assert data["data"]["contactName"] is None
             assert data["data"]["phone"] is None
             assert data["data"]["imageUrl"] is None
+

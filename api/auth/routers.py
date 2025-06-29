@@ -11,10 +11,10 @@ router = APIRouter()
 async def signup_user(user_data: UserSignup):
     try:
         result = await create_user_service(user_data)
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=result.dict())
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=result.model_dump())
     except Exception as e:
         error_response = UserResponse.error(str(e), code=status.HTTP_400_BAD_REQUEST)
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error_response.dict())
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=error_response.model_dump())
 
 
 @router.get("/")

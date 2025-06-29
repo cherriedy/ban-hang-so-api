@@ -103,6 +103,7 @@ class TestAuthSignup:
             # Assertions
             assert isinstance(result, UserResponse)
             assert result.status == "success"
+            assert result.data.id == "test_user_id"  # Check user ID is included
             assert result.data.email == "owner@example.com"
             assert result.data.contactName == "Store Owner"
             assert len(result.data.stores) == 1
@@ -177,6 +178,7 @@ class TestAuthSignup:
             # Assertions
             assert isinstance(result, UserResponse)
             assert result.status == "success"
+            assert result.data.id == "test_user_id"  # Check user ID is included
             assert result.data.email == "staff@example.com"
             assert result.data.contactName == "Staff Member"
             assert len(result.data.stores) == 1

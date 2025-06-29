@@ -101,6 +101,7 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
         stores_models = [StoreInUser(**store) for store in stores_data]  # Convert store data to StoreInUser models
 
         user_base = UserBase(
+            id=user_record.uid,  # Add the user ID from Firebase Auth
             email=user_doc_dict.get("email"),
             contactName=user_doc_dict.get("contactName"),
             phone=user_doc_dict.get("phone"),
@@ -112,18 +113,29 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
 
         return UserResponse.success(user_base)
     except Exception as e:
-        # Rollback if Auth succeeded but Firestore failed
+        # Comprehensive rollback logic
+        rollback_errors = []
+
+        # Rollback Firebase Auth user if it was created
         if user_record:
             try:
                 auth.delete_user(user_record.uid)
+                print(f"Successfully rolled back Firebase Auth user: {user_record.uid}")
             except Exception as rollback_error:
-                print(f"Rollback failed: {str(rollback_error)}")
+                rollback_errors.append(f"Failed to rollback Firebase Auth user: {str(rollback_error)}")
 
-        # Rollback store creation if it was created
+        # Rollback store creation if it was created (only for owner role)
         if store_ref and user_data.role == "owner":
             try:
                 store_ref.delete()
+                print(f"Successfully rolled back store creation")
             except Exception as rollback_error:
-                print(f"Store rollback failed: {str(rollback_error)}")
+                rollback_errors.append(f"Failed to rollback store creation: {str(rollback_error)}")
 
+        # Log all rollback errors if any occurred
+        if rollback_errors:
+            for error in rollback_errors:
+                print(f"Rollback error: {error}")
+
+        # Re-raise the original exception
         raise e
