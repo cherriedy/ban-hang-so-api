@@ -1,4 +1,5 @@
 from firebase_admin import auth, firestore
+from datetime import datetime
 
 from .schemas import UserSignup, UserResponse, StoreInUser, UserBase  # Added UserBase
 
@@ -86,6 +87,15 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
 
         user_doc_dict = created_user_doc.to_dict()
 
+        # Convert Firestore timestamps to Python datetime objects
+        created_at = user_doc_dict.get("createdAt")
+        updated_at = user_doc_dict.get("updatedAt")
+
+        if hasattr(created_at, 'timestamp'):
+            created_at = datetime.fromtimestamp(created_at.timestamp())
+        if hasattr(updated_at, 'timestamp'):
+            updated_at = datetime.fromtimestamp(updated_at.timestamp())
+
         # Ensure stores is an empty list if not present or None (it should be [] from user_doc_data)
         stores_data = user_doc_dict.get("stores", [])
         stores_models = [StoreInUser(**store) for store in stores_data]  # Convert store data to StoreInUser models
@@ -96,8 +106,8 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
             phone=user_doc_dict.get("phone"),
             imageUrl=user_doc_dict.get("imageUrl"),
             stores=stores_models,
-            createdAt=user_doc_dict.get("createdAt"),
-            updatedAt=user_doc_dict.get("updatedAt")
+            createdAt=created_at,
+            updatedAt=updated_at
         )
 
         return UserResponse.success(user_base)
