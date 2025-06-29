@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add store_id field to product schemas and implement store-based authorization in product endpoints">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor signup error handling to return JSend format responses for better consistency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -411,7 +409,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751126624274</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Refactor signup error handling to return JSend format responses for better consistency">
+      <option name="closed" value="true" />
+      <created>1751128554467</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1751128554467</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -426,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix import statement for schemas in services.py" />
     <MESSAGE value="Add user stores retrieval endpoint and update schemas for user response" />
     <MESSAGE value="Refactor UserResponse schema to remove unnecessary inheritance and clean up imports in services.py" />
     <MESSAGE value="Refactor TimestampMixin to remove inheritance from BaseModel" />
@@ -451,6 +456,7 @@
     <MESSAGE value="Add image upload support for products; implement Firebase Storage utilities and temporary file handling" />
     <MESSAGE value="Update Firebase Storage upload to set metadata after file upload; ensure metadata is properly applied" />
     <MESSAGE value="Add store_id field to product schemas and implement store-based authorization in product endpoints" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add store_id field to product schemas and implement store-based authorization in product endpoints" />
+    <MESSAGE value="Refactor signup error handling to return JSend format responses for better consistency" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor signup error handling to return JSend format responses for better consistency" />
   </component>
 </project>
