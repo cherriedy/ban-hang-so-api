@@ -16,8 +16,23 @@ router = APIRouter()
 
 
 # Create a dependency function for store-based auth
-async def get_store_auth(store_id: str = Query(...)) -> tuple[str, dict]:
-    return await get_authorized_store_access(store_id)
+async def get_store_auth(
+    store_id: str = Query(..., description="Store ID to access"),
+    user_id: str = Depends(get_current_user_id)
+) -> tuple[str, dict]:
+    """
+    Dependency that combines user authentication and store authorization.
+
+    Args:
+        store_id: The ID of the store to access (from query parameter)
+        user_id: The authenticated user ID (injected by dependency)
+
+    Returns:
+        tuple: (user_id, store_info)
+    """
+    from api.auth.dependencies import verify_store_access
+    store_info = await verify_store_access(user_id, store_id)
+    return user_id, store_info
 
 
 @router.get("", response_model=JSendResponse[ProductsData])
