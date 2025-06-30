@@ -62,10 +62,12 @@ app = FastAPI(title="Ban Hang So API")
 from api.auth.routers import router as auth_router
 from api.stores.routers import router as stores_router
 from api.products.routers import router as products_router
+from api.categories.routers import router as categories_router
 
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(stores_router, prefix="/stores", tags=["stores"])
 app.include_router(products_router, prefix="/products", tags=["products"])
+app.include_router(categories_router, prefix="/categories", tags=["categories"])
 
 
 @app.get("/")

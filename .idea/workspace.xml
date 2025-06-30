@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor product schema and service to use storeId for consistency with database">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor get_store_auth to combine user authentication and store authorization">
+      <change afterPath="$PROJECT_DIR$/api/categories/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/categories/routers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/categories/schemas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/categories/services.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_categories_endpoints.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_categories_schemas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_categories_services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -458,7 +466,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751217489566</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Refactor get_store_auth to combine user authentication and store authorization">
+      <option name="closed" value="true" />
+      <created>1751222307970</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1751222307970</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -473,7 +489,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix user stores retrieval to return a list directly without awaiting the service call" />
     <MESSAGE value="Add JSend response format and update user store retrieval and creation endpoints" />
     <MESSAGE value="Refactor store service to support both creation and updating of stores" />
     <MESSAGE value="Add products router and update schemas for user and store models" />
@@ -498,6 +513,7 @@
     <MESSAGE value="Refactor user response to include user ID and serialize timestamps to ISO format" />
     <MESSAGE value="Handle email already in use error during user creation in Firebase Auth" />
     <MESSAGE value="Refactor product schema and service to use storeId for consistency with database" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor product schema and service to use storeId for consistency with database" />
+    <MESSAGE value="Refactor get_store_auth to combine user authentication and store authorization" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor get_store_auth to combine user authentication and store authorization" />
   </component>
 </project>
