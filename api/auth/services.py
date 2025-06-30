@@ -1,5 +1,6 @@
-from firebase_admin import auth, firestore
 from datetime import datetime
+
+from firebase_admin import auth, firestore
 
 from .schemas import UserSignup, UserResponse, StoreInUser, UserBase  # Added UserBase
 
@@ -56,17 +57,17 @@ async def create_user_service(user_data: UserSignup) -> UserResponse:  # Changed
             store_id = store_ref.id
             store_ref.set(store_dict)
 
-            # Add store with ADMIN role to user's stores
+            # Add store with owner role to user's stores
             stores_list = [{
                 "id": store_id,
-                "role": "ADMIN"
+                "role": "owner"
             }]
 
         elif user_data.role == "staff":
-            # Add existing store with STAFF role to user's stores
+            # Add existing store with staff role to user's stores
             stores_list = [{
                 "id": user_data.storeId,
-                "role": "STAFF"
+                "role": "staff"
             }]
 
         # Prepare user document for Firestore
