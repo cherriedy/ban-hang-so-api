@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add category management endpoints with CRUD operations and schema definitions">
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor user role assignments in store creation to use consistent naming">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -475,7 +474,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751259913562</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Refactor user role assignments in store creation to use consistent naming">
+      <option name="closed" value="true" />
+      <created>1751267848328</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1751267848328</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -490,7 +497,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Refactor store service to support both creation and updating of stores" />
     <MESSAGE value="Add products router and update schemas for user and store models" />
     <MESSAGE value="Update product sorting logic to support ascending and descending order" />
     <MESSAGE value="Refactor product schemas and services to remove unused fields" />
@@ -515,6 +521,7 @@
     <MESSAGE value="Refactor product schema and service to use storeId for consistency with database" />
     <MESSAGE value="Refactor get_store_auth to combine user authentication and store authorization" />
     <MESSAGE value="Add category management endpoints with CRUD operations and schema definitions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add category management endpoints with CRUD operations and schema definitions" />
+    <MESSAGE value="Refactor user role assignments in store creation to use consistent naming" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor user role assignments in store creation to use consistent naming" />
   </component>
 </project>

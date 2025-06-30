@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query, Path, UploadFile, File, Form, Depends
+from fastapi import APIRouter, HTTPException, Query, Path, UploadFile, File, Depends
 from starlette import status
 
-from api.auth.dependencies import get_authorized_store_access, get_current_user_id, verify_store_access
+from api.auth.dependencies import get_current_user_id
 from api.common.schemas import JSendResponse
 from api.common.storage import upload_image
 from api.products.schemas import (
@@ -154,32 +154,27 @@ async def get_product(
 @router.post("", response_model=JSendResponse[ProductInDB])
 async def create_product_endpoint(
     product_data: ProductCreate,
-    user_id: str = Depends(get_current_user_id)
+    auth_info: tuple = Depends(get_store_auth)
 ):
     """
     Create a new product in a specific store.
 
     Args:
-        product_data: The product data to create (including storeId)
-        user_id: Authenticated user ID (injected)
+        product_data: The product data to create (storeId will be set from query parameter)
+        auth_info: Authentication and authorization info (injected)
 
     Returns:
         JSendResponse containing the created product
     """
     try:
+        user_id, store_info = auth_info
+        store_id = store_info['id']
+
         # Filter out None values to avoid overwriting with nulls
         data = {k: v for k, v in product_data.model_dump().items() if v is not None}
 
-        # Extract storeId from the product data
-        store_id = data.get('storeId')
-        if not store_id:
-            return JSendResponse.error(
-                message="storeId is required",
-                code=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Verify user has access to the store
-        await verify_store_access(user_id, store_id)
+        # Set storeId from the query parameter
+        data['storeId'] = store_id
 
         created_product = await create_product(data, store_id)
         return JSendResponse.success(created_product)

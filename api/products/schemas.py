@@ -5,7 +5,7 @@ These models are used for request and response validation and serialization.
 
 from typing import Optional
 
-from pydantic import BaseModel, field_validator, Field
+from pydantic import BaseModel, field_validator
 
 from api.common.schemas import TimestampMixin, PaginationResponse, JSendResponse
 
@@ -16,7 +16,7 @@ class CategorySchema(BaseModel, TimestampMixin):
     """
     id: str
     name: str
-    storeId: str  # Added storeId to associate category with store
+    storeId: Optional[str] = None  # Made optional for product creation
     empty: bool = False
 
 
@@ -26,7 +26,7 @@ class BrandSchema(BaseModel, TimestampMixin):
     """
     id: str
     name: str
-    storeId: str  # Added storeId to associate brand with store
+    storeId: Optional[str] = None  # Made optional for product creation
     empty: bool = False
 
 
@@ -44,13 +44,13 @@ class ProductBase(BaseModel):
     stockQuantity: int = 0
     status: bool = True
     avatarUrl: Optional[str] = None
-    storeId: str  # Database uses storeId directly
 
 
 class ProductCreate(ProductBase):
     """
     Represents the request data for creating a new product.
     """
+    storeId: Optional[str] = None  # Made optional since it comes from query parameter
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
 
@@ -80,6 +80,7 @@ class ProductInDB(ProductBase, TimestampMixin):
     Represents a product as stored in the database, including all metadata.
     """
     id: str
+    storeId: str  # Required for database storage
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
 
