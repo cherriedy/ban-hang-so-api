@@ -125,3 +125,7 @@ class JSendResponse(BaseModel, Generic[T]):
     def error(cls, message: str, code: Optional[int] = None, data: Any = None) -> 'JSendResponse':
         """Create an error response for system or unexpected errors"""
         return cls(status=JSendStatus.ERROR, message=message, code=code, data=data)
+
+
+OWNER_ROLE = "owner"
+STAFF_ROLE = "staff"

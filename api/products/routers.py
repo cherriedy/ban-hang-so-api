@@ -9,7 +9,7 @@ from api.products.schemas import (
 )
 from api.products.services import (
     get_products, get_product_by_id, create_product,
-    update_product, delete_product, search_products as search_products_service
+    update_product, delete_product, search_products as search_products_service,
 )
 
 router = APIRouter()

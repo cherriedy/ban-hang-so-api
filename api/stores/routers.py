@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 
+from api.auth.dependencies import get_store_owner_access
 from api.common.schemas import JSendResponse
-from api.stores.schemas import CreateStoreRequest, CreateStoreResponse, UserStoresData
-from api.stores.services import get_user_stores_service, save_store_service
+from api.stores.schemas import CreateStoreRequest, CreateStoreResponse, UserStoresData, UpdateStoreRequest
+from api.stores.services import get_user_stores_service, save_store_service, update_store_service
 
 router = APIRouter()
 
@@ -68,3 +69,35 @@ async def create_store(user_id: str, store_data: CreateStoreRequest):
             code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+@router.put("/{store_id}", response_model=JSendResponse[dict])
+async def update_store(
+    store_id: str,
+    store_data: UpdateStoreRequest,
+    user_store_access: tuple = Depends(get_store_owner_access)
+):
+    """
+    Updates store information. Only store owners can perform this operation.
+
+    Args:
+        store_id: The ID of the store to update
+        store_data: The store information to update (partial updates allowed)
+        user_store_access: Injected dependency that verifies owner access
+
+    Returns:
+        JSendResponse with updated store information
+    """
+    try:
+        user_id, store_info = user_store_access
+        updated_store = update_store_service(store_id, user_id, store_data)
+        return JSendResponse.success(updated_store)
+    except HTTPException as e:
+        return JSendResponse.error(
+            message=str(e.detail),
+            code=e.status_code
+        )
+    except Exception as e:
+        return JSendResponse.error(
+            message=str(e),
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

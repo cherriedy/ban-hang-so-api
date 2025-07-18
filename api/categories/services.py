@@ -63,10 +63,22 @@ async def get_categories(store_id: str, limit: int = 100, offset: int = 0,
         query = query.limit(limit)
         categories_docs = query.get()
 
+        # Get all products for the store in one query
+        products_ref = db.collection('products').where('storeId', '==', store_id)
+        products_docs = products_ref.get()
+        category_product_counts = {}
+        for product_doc in products_docs:
+            product = product_doc.to_dict()
+            category_id = product.get('category', {}).get('id')
+            if category_id:
+                category_product_counts[category_id] = category_product_counts.get(category_id, 0) + 1
+
         category_items = []
         for doc in categories_docs:
             category_data = doc.to_dict()
             category_data['id'] = doc.id
+            # Use precomputed product count
+            category_data['productCount'] = category_product_counts.get(doc.id, 0)
             category_items.append(CategoryInDB(**category_data))
 
         # If we couldn't order in the query, sort in memory
@@ -143,6 +155,11 @@ async def get_category_by_id(category_id: str, store_id: str) -> CategoryInDB:
             )
 
         category_data['id'] = doc.id
+
+        # Add product count for this category
+        product_count = await count_products_by_category(category_id, store_id)
+        category_data['productCount'] = product_count
+
         return CategoryInDB(**category_data)
 
     except HTTPException:
@@ -304,6 +321,23 @@ async def update_category(category_id: str, category_data: dict, store_id: str) 
             raise HTTPException(status_code=500, detail="Failed to retrieve updated category")
 
         updated_category_dict['id'] = category_id
+
+        # After updating the category, update all products referencing this category if name or imageUrl changed
+        updated_fields = {}
+        if 'name' in update_data and update_data['name'] != existing_category_data.get('name'):
+            updated_fields['category.name'] = update_data['name']
+        if 'imageUrl' in update_data and update_data['imageUrl'] != existing_category_data.get('imageUrl'):
+            updated_fields['category.imageUrl'] = update_data['imageUrl']
+        if updated_fields:
+            # Use batch to update all products with this category id
+            products_ref = db.collection('products').where('storeId', '==', store_id).where('category.id', '==', category_id)
+            products = products_ref.get()
+            batch = db.batch()
+            for product in products:
+                product_ref = product.reference
+                batch.update(product_ref, updated_fields)
+            batch.commit()
+
         return CategoryInDB(**updated_category_dict)
 
     except HTTPException:
@@ -378,6 +412,150 @@ async def delete_category(category_id: str, store_id: str) -> bool:
     except HTTPException:
         # Re-raise HTTP exceptions to preserve status code and detail
         raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )
+
+
+async def count_products_by_category(category_id: str, store_id: str) -> int:
+    """
+    Count the number of products that belong to a specific category.
+
+    Args:
+        category_id: The ID of the category
+        store_id: The ID of the store
+
+    Returns:
+        int: Number of products in the category
+    """
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products').where('storeId', '==', store_id).where('category.id', '==', category_id)
+        count_query = products_ref.count()
+        count_result = count_query.get()
+        return count_result[0][0].value
+    except Exception:
+        return 0
+
+
+async def count_products_by_brand(brand_id: str, store_id: str) -> int:
+    """
+    Count the number of products that belong to a specific brand.
+
+    Args:
+        brand_id: The ID of the brand
+        store_id: The ID of the store
+
+    Returns:
+        int: Number of products in the brand
+    """
+    try:
+        db = get_firestore_client()
+        products_ref = db.collection('products').where('storeId', '==', store_id).where('brand.id', '==', brand_id)
+        count_query = products_ref.count()
+        count_result = count_query.get()
+        return count_result[0][0].value
+    except Exception:
+        return 0
+
+
+async def search_categories(query: str, store_id: str, limit: int = 100, offset: int = 0) -> CategoriesData:
+    """
+    Service function to search for categories by name with pagination within a specific store.
+
+    Args:
+        query: The search query
+        store_id: The ID of the store to search categories in
+        limit: Maximum number of categories to return
+        offset: Number of categories to skip
+
+    Returns:
+        CategoriesData object containing the paginated search results
+
+    Raises:
+        HTTPException: If errors occur during search
+    """
+    if not store_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID parameter"
+        )
+
+    try:
+        db = get_firestore_client()
+        categories_ref = db.collection('categories').where('storeId', '==', store_id)
+
+        # If query is empty, return all categories for the store instead of searching
+        if not query or query.strip() == "":
+            return await get_categories(store_id=store_id, limit=limit, offset=offset)
+
+        query = query.lower().strip()  # Normalize query for case-insensitive search
+
+        # List to store all found categories with their relevance score
+        categories = []
+
+        # Fetch all categories for the store and perform client-side filtering
+        # This approach allows searching for substrings anywhere in the fields
+        all_categories = categories_ref.get()
+
+        for doc in all_categories:
+            category_data = doc.to_dict()
+            category_data['id'] = doc.id
+
+            # Skip categories that don't have required fields
+            if not category_data:
+                continue
+
+            # Initialize relevance score
+            relevance_score = 0
+
+            # Check name field (main search field for categories)
+            name = category_data.get('name', '').lower()
+            if query in name:
+                # Higher score for exact matches
+                if name == query:
+                    relevance_score += 15
+                # Higher score if query is at the beginning of the name
+                elif name.startswith(query):
+                    relevance_score += 12
+                # Standard score for substring matches
+                else:
+                    relevance_score += 10
+
+            # Only include categories that match the search query
+            if relevance_score > 0:
+                # Add product count for this category
+                product_count = await count_products_by_category(doc.id, store_id)
+                category_data['productCount'] = product_count
+
+                categories.append({
+                    'data': CategoryInDB(**category_data),
+                    'score': relevance_score
+                })
+
+        # Sort by relevance score (highest first), then by name for ties
+        categories.sort(key=lambda x: (-x['score'], x['data'].name.lower()))
+
+        # Extract just the category data after sorting
+        sorted_categories = [item['data'] for item in categories]
+
+        # Apply pagination
+        total = len(sorted_categories)
+        paginated_categories = sorted_categories[offset:offset + limit]
+
+        page = offset // limit + 1
+        pages = (total + limit - 1) // limit if limit > 0 else 0
+
+        return CategoriesData(
+            items=paginated_categories,
+            total=total,
+            page=page,
+            size=limit,
+            pages=pages
+        )
+
     except Exception as exc:
         raise HTTPException(
             status_code=500,

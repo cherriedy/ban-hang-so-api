@@ -3,7 +3,7 @@ This module defines the Pydantic models used for product management.
 These models are used for request and response validation and serialization.
 """
 
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, field_validator
 
@@ -14,7 +14,7 @@ class CategorySchema(BaseModel, TimestampMixin):
     """
     Represents a product category with its metadata.
     """
-    id: str
+    id: Optional[str] = None  # Made optional to handle data without id
     name: str
     storeId: Optional[str] = None  # Made optional for product creation
     empty: bool = False
@@ -24,7 +24,7 @@ class BrandSchema(BaseModel, TimestampMixin):
     """
     Represents a product brand with its metadata.
     """
-    id: str
+    id: Optional[str] = None  # Made optional to handle data without id
     name: str
     storeId: Optional[str] = None  # Made optional for product creation
     empty: bool = False
@@ -43,7 +43,8 @@ class ProductBase(BaseModel):
     discountPrice: float = 0
     stockQuantity: int = 0
     status: bool = True
-    avatarUrl: Optional[str] = None
+    imageUrls: List[str] = []
+    thumbnailUrl: Optional[str] = None
 
 
 class ProductCreate(ProductBase):
@@ -69,7 +70,8 @@ class ProductUpdate(BaseModel):
     discountPrice: Optional[float] = None
     stockQuantity: Optional[int] = None
     status: Optional[bool] = None
-    avatarUrl: Optional[str] = None
+    imageUrls: Optional[List[str]] = None
+    thumbnailUrl: Optional[str] = None
     brand: Optional[BrandSchema] = None
     category: Optional[CategorySchema] = None
     storeId: Optional[str] = None  # Changed from store_id to storeId
@@ -92,9 +94,13 @@ class ProductInDB(ProductBase, TimestampMixin):
             return None
 
         if isinstance(value, dict):
-            # If id is missing, return None instead of an incomplete object
-            if 'id' not in value:
+            # If name is missing, return None as it's required for meaningful data
+            if 'name' not in value or not value['name']:
                 return None
+
+            # If id is missing, we can still process the data
+            # This handles cases where brand/category data is stored without document IDs
+            return value
 
         return value
 
@@ -108,65 +114,22 @@ class ProductDetailData(BaseModel):
 
 class ProductsData(PaginationResponse[ProductInDB]):
     """
-    Represents a paginated list of products.
-    Inherits pagination fields from PaginationResponse and specifies
-    ProductInDB as the type for 'items'.
+    Represents a paginated list of products for response.
     """
     pass
 
 
-class ProductResponse(JSendResponse):
-    """
-    Product data returned in JSend format.
-
-    Example:
-    {
-        "status": "success",
-        "data": {
-            "id": "123",
-            "name": "Product name",
-            ...
-        }
-    }
-    """
-    data: Optional[ProductInDB] = None
+class ProductResponse(JSendResponse[ProductInDB]):
+    """Response model for single product operations."""
+    pass
 
 
-class ProductsResponse(JSendResponse):
-    """
-    Multiple products data returned in JSend format with pagination info.
-
-    Example:
-    {
-        "status": "success",
-        "data": {
-            "items": [...],
-            "total": 100,
-            "page": 2,
-            "size": 20,
-            "pages": 5
-        }
-    }
-    """
-    data: Optional[ProductsData] = None
+class ProductListResponse(JSendResponse[ProductsData]):
+    """Response model for product list operations."""
+    pass
 
 
-class ProductUpsert(BaseModel):
-    """
-    Combined schema for both creating and updating products.
-    If id is provided, it will update the product, otherwise create a new one.
-    """
-    id: Optional[str] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    barcode: Optional[str] = None
-    note: Optional[str] = None
-    purchasePrice: Optional[float] = None
-    sellingPrice: Optional[float] = None
-    discountPrice: Optional[float] = None
-    stockQuantity: Optional[int] = None
-    status: Optional[bool] = None
-    avatarUrl: Optional[str] = None
-    brand: Optional[BrandSchema] = None
-    category: Optional[CategorySchema] = None
-    storeId: Optional[str] = None  # Changed from store_id to storeId
+class ProductDeleteResponse(JSendResponse[dict]):
+    """Response model for product deletion operations."""
+    pass
+

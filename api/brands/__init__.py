@@ -1,0 +1,2 @@
+# Brands module initialization
+

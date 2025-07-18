@@ -4,7 +4,6 @@ These models are used for request and response validation and serialization.
 """
 
 from typing import Optional
-from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -16,12 +15,12 @@ class CategoryBase(BaseModel):
     Base model for category data that is common to create, update and response models.
     """
     name: str = Field(..., min_length=1, max_length=100, description="Category name")
-    storeId: str = Field(..., description="Store ID that owns this category")
 
 
 class CategoryCreate(CategoryBase):
     """
     Represents the request data for creating a new category.
+    Only requires name, storeId comes from authentication.
     """
     pass
 
@@ -39,6 +38,8 @@ class CategoryInDB(CategoryBase, TimestampMixin):
     Represents a category as stored in the database, including all metadata.
     """
     id: str = Field(..., description="Unique category identifier")
+    storeId: str = Field(..., description="Store ID that owns this category")
+    productCount: Optional[int] = Field(default=0, description="Number of products in this category")
 
 
 class CategoryDetailData(BaseModel):

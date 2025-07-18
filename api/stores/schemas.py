@@ -32,6 +32,16 @@ class CreateStoreRequest(BaseModel):
     imageUrl: Optional[str] = None
 
 
+class UpdateStoreRequest(BaseModel):
+    """
+    Represents the request data for updating store information.
+    All fields are optional to allow partial updates.
+    """
+    name: Optional[str] = None
+    description: Optional[str] = None
+    imageUrl: Optional[str] = None
+
+
 class CreateStoreResponse(BaseModel):
     """
     Store data returned after creation in JSend format
@@ -44,6 +54,3 @@ class UserStoresData(BaseModel):
     Stores data returned for a user in JSend format
     """
     stores: List[UserStore]
-
-
-

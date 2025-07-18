@@ -1,5 +1,7 @@
 import json
 import os
+import pytz
+from datetime import datetime
 
 import firebase_admin
 import uvicorn
@@ -8,6 +10,9 @@ from fastapi import FastAPI
 from firebase_admin import credentials
 
 load_dotenv()
+
+# Set default timezone for the application
+DEFAULT_TIMEZONE = pytz.timezone('Asia/Ho_Chi_Minh')
 
 # Load Firebase credentials
 # Priority: FIREBASE_CREDENTIALS_JSON_CONTENT env var (for production/Render)
@@ -63,11 +68,23 @@ from api.auth.routers import router as auth_router
 from api.stores.routers import router as stores_router
 from api.products.routers import router as products_router
 from api.categories.routers import router as categories_router
+from api.brands.routers import router as brands_router
+from api.staffs.routers import router as staff_router
+from api.customers.routers import router as customers_router
+from api.sales.routers import router as sales_router
+from api.transactions.routers import router as transactions_router
+from api.reports.routers import router as reports_router
 
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(stores_router, prefix="/stores", tags=["stores"])
 app.include_router(products_router, prefix="/products", tags=["products"])
 app.include_router(categories_router, prefix="/categories", tags=["categories"])
+app.include_router(brands_router, prefix="/brands", tags=["brands"])
+app.include_router(staff_router, prefix="/staffs", tags=["staffs"])
+app.include_router(customers_router, prefix="/customers", tags=["customers"])
+app.include_router(sales_router, prefix="/sales", tags=["sales"])
+app.include_router(transactions_router, prefix="/transactions", tags=["transactions"])
+app.include_router(reports_router, prefix="/reports", tags=["reports"])
 
 
 @app.get("/")

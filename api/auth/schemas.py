@@ -36,9 +36,19 @@ class UserSignup(BaseModel):
     displayName: Optional[str] = None
     phone: Optional[str] = None
     imageUrl: Optional[str] = None
-    role: str = Field(..., description="User role: 'owner' or 'staff'")
+    role: str = Field(..., description="User role: 'owner' or 'staffs'")
     storeInfo: Optional[StoreInfo] = Field(None, description="Store information for owner role")
-    storeId: Optional[str] = Field(None, description="Store ID for staff role")
+    storeId: Optional[str] = Field(None, description="Store ID for staffs role")
+
+
+class StaffAccountCreate(BaseModel):
+    """
+    Represents the request data for creating a staffs account with auto-generated password.
+    """
+    email: EmailStr
+    displayName: Optional[str] = None
+    phone: Optional[str] = None
+    imageUrl: Optional[str] = None
 
 
 class UserBase(BaseModel):

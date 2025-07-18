@@ -32,13 +32,13 @@ class TestAuthSignup:
 
     @pytest.fixture
     def valid_staff_signup_data(self):
-        """Valid signup data for staff member."""
+        """Valid signup data for staffs member."""
         return UserSignup(
-            email="staff@example.com",
+            email="staffs@example.com",
             password="password123",
             displayName="Staff Member",
             phone="0987654321",
-            role="staff",
+            role="staffs",
             storeId="existing_store_id",
             storeInfo=None
         )
@@ -133,7 +133,7 @@ class TestAuthSignup:
 
     @pytest.mark.asyncio
     async def test_staff_signup_success(self, valid_staff_signup_data, mock_user_record, mock_user_doc_data):
-        """Test successful signup for staff member - joins existing store."""
+        """Test successful signup for staffs member - joins existing store."""
         with patch('api.auth.services.auth') as mock_auth, \
              patch('api.auth.services.db') as mock_db:
             
@@ -151,9 +151,9 @@ class TestAuthSignup:
             mock_user_doc = MagicMock()
             mock_user_doc.exists = True
             
-            # Update mock data for staff
+            # Update mock data for staffs
             staff_doc_data = mock_user_doc_data.copy()
-            staff_doc_data["email"] = "staff@example.com"
+            staff_doc_data["email"] = "staffs@example.com"
             staff_doc_data["contactName"] = "Staff Member"
             staff_doc_data["stores"] = [{"id": "existing_store_id", "role": "STAFF"}]
             mock_user_doc.to_dict.return_value = staff_doc_data
@@ -179,7 +179,7 @@ class TestAuthSignup:
             assert isinstance(result, UserResponse)
             assert result.status == "success"
             assert result.data.id == "test_user_id"  # Check user ID is included
-            assert result.data.email == "staff@example.com"
+            assert result.data.email == "staffs@example.com"
             assert result.data.contactName == "Staff Member"
             assert len(result.data.stores) == 1
             assert result.data.stores[0].id == "existing_store_id"
@@ -187,7 +187,7 @@ class TestAuthSignup:
 
             # Verify Firebase Auth was called correctly
             mock_auth.create_user.assert_called_once_with(
-                email="staff@example.com",
+                email="staffs@example.com",
                 password="password123",
                 display_name="Staff Member",
                 photo_url=None
@@ -221,18 +221,18 @@ class TestAuthSignup:
 
     @pytest.mark.asyncio
     async def test_staff_signup_missing_store_id(self):
-        """Test staff signup fails when store ID is missing."""
+        """Test staffs signup fails when store ID is missing."""
         signup_data = UserSignup(
-            email="staff@example.com",
+            email="staffs@example.com",
             password="password123",
-            role="staff"
+            role="staffs"
             # Missing storeId
         )
 
         with pytest.raises(ValueError) as exc_info:
             await create_user_service(signup_data)
 
-        assert "Store ID is required for staff role" in str(exc_info.value)
+        assert "Store ID is required for staffs role" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_invalid_role(self):
@@ -246,11 +246,11 @@ class TestAuthSignup:
         with pytest.raises(ValueError) as exc_info:
             await create_user_service(signup_data)
 
-        assert "Role must be either 'owner' or 'staff'" in str(exc_info.value)
+        assert "Role must be either 'owner' or 'staffs'" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_staff_signup_nonexistent_store(self, valid_staff_signup_data):
-        """Test staff signup fails when store doesn't exist."""
+        """Test staffs signup fails when store doesn't exist."""
         with patch('api.auth.services.db') as mock_db:
             # Mock nonexistent store
             mock_store_ref = MagicMock()
@@ -307,7 +307,7 @@ class TestAuthSignup:
 
     @pytest.mark.asyncio
     async def test_staff_signup_no_store_rollback(self, valid_staff_signup_data, mock_user_record):
-        """Test that store rollback is not attempted for staff signup failures."""
+        """Test that store rollback is not attempted for staffs signup failures."""
         with patch('api.auth.services.auth') as mock_auth, \
              patch('api.auth.services.db') as mock_db:
             
@@ -343,7 +343,7 @@ class TestAuthSignup:
 
             # Verify user rollback was attempted
             mock_auth.delete_user.assert_called_once_with("test_user_id")
-            # Verify store rollback was NOT attempted (staff doesn't create stores)
+            # Verify store rollback was NOT attempted (staffs doesn't create stores)
             mock_store_ref.delete.assert_not_called()
 
     @pytest.mark.asyncio

@@ -1,3 +1,6 @@
+import urllib.parse
+from typing import List
+
 from fastapi import HTTPException
 from firebase_admin import firestore
 
@@ -7,6 +10,44 @@ from api.products.schemas import ProductInDB, ProductsData
 
 def get_firestore_client():
     return firestore.client()
+
+
+def generate_default_thumbnail(product_name: str) -> str:
+    """
+    Generate a default thumbnail URL for a product when no images are provided.
+    Similar to customer avatar logic but for products.
+    """
+    encoded_name = urllib.parse.quote(product_name)
+    encoded_colors = urllib.parse.quote("f0f0f0,e0e0e0,d0d0d0")
+    return f"https://api.dicebear.com/9.x/initials/png?seed={encoded_name}&backgroundColor={encoded_colors}"
+
+
+def process_product_images(image_urls: List[str], product_name: str) -> tuple[List[str], str]:
+    """
+    Process product images and determine thumbnail URL.
+
+    Args:
+        image_urls: List of image URLs
+        product_name: Name of the product for default thumbnail generation
+
+    Returns:
+        Tuple of (processed_image_urls, thumbnail_url)
+    """
+    if not image_urls:
+        # Empty list - use default thumbnail
+        return [], generate_default_thumbnail(product_name)
+
+    # Filter out empty strings and None values
+    processed_urls = [url for url in image_urls if url and url.strip()]
+
+    if not processed_urls:
+        # All URLs were empty - use default thumbnail
+        return [], generate_default_thumbnail(product_name)
+
+    # Use first image as thumbnail
+    thumbnail_url = processed_urls[0]
+
+    return processed_urls, thumbnail_url
 
 
 async def get_products(store_id: str, limit: int = 100, offset: int = 0,
@@ -186,6 +227,8 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
             # Verify brand belongs to the same store
             if brand_data.get('storeId') != store_id:
                 raise HTTPException(status_code=400, detail=f"Brand does not belong to store {store_id}")
+            # Preserve the brand ID
+            brand_data['id'] = brand_id
             product_data['brand'] = brand_data
 
         # Fetch and replace category data if provided
@@ -200,6 +243,8 @@ async def create_product(product_data: dict, store_id: str) -> ProductInDB:
             # Verify category belongs to the same store
             if category_data.get('storeId') != store_id:
                 raise HTTPException(status_code=400, detail=f"Category does not belong to store {store_id}")
+            # Preserve the category ID
+            category_data['id'] = category_id
             product_data['category'] = category_data
 
         products_ref = db.collection('products')
@@ -434,6 +479,8 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
                 # Verify brand belongs to the same store
                 if brand_data.get('storeId') != store_id:
                     raise HTTPException(status_code=400, detail=f"Brand does not belong to store {store_id}")
+                # Preserve the brand ID
+                brand_data['id'] = brand_id
                 update_data['brand'] = brand_data
             else:  # handle case where brand is set to null
                 update_data['brand'] = None
@@ -451,9 +498,26 @@ async def update_product(product_id: str, product_data: dict, store_id: str) -> 
                 # Verify category belongs to the same store
                 if category_data.get('storeId') != store_id:
                     raise HTTPException(status_code=400, detail=f"Category does not belong to store {store_id}")
+                # Preserve the category ID
+                category_data['id'] = category_id
                 update_data['category'] = category_data
             else:  # handle case where category is set to null
                 update_data['category'] = None
+
+        # --- Handle imageUrls and thumbnail update logic ---
+        old_image_urls = existing_product_data.get('imageUrls', [])
+        new_image_urls = update_data.get('imageUrls', old_image_urls)
+        product_name = update_data.get('name', existing_product_data.get('name', ''))
+
+        # Only update thumbnailUrl if imageUrls changed or if imageUrls is empty
+        if new_image_urls != old_image_urls:
+            processed_urls, new_thumbnail = process_product_images(new_image_urls, product_name)
+            update_data['imageUrls'] = processed_urls
+            update_data['thumbnailUrl'] = new_thumbnail
+        elif not old_image_urls:
+            update_data['thumbnailUrl'] = generate_default_thumbnail(product_name)
+        # else: do not update thumbnailUrl if imageUrls unchanged and not empty
+        # --- End image/thumbnail logic ---
 
         # Update only provided fields
         update_data['updatedAt'] = firestore.firestore.SERVER_TIMESTAMP
@@ -534,7 +598,6 @@ async def delete_product(product_id: str, store_id: str) -> bool:
         return True
 
     except HTTPException:
-        # Re-raise HTTP exceptions to preserve status code and detail
         raise
     except Exception as exc:
         raise HTTPException(

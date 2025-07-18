@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from firebase_admin import firestore
 
 from api.stores.schemas import UserStore, CreateStoreRequest, UserStoresData, \
-    CreateStoreResponse  # Added CreateStoreResponse
+    CreateStoreResponse, UpdateStoreRequest  # Added UpdateStoreRequest
 
 
 def get_firestore_client():
@@ -178,3 +178,91 @@ def save_store_service(user_id: str, store_data: CreateStoreRequest) -> CreateSt
             detail=f"Internal server error: {str(exc)}"
         )
 
+
+def update_store_service(store_id: str, user_id: str, store_data: UpdateStoreRequest) -> dict:
+    """
+    Service function to update store information. Only store owners can perform this operation.
+
+    Args:
+        store_id: The ID of the store to update
+        user_id: The ID of the user requesting the update
+        store_data: The store data to update
+
+    Returns:
+        dict: Updated store information
+
+    Raises:
+        HTTPException: If store is not found, user lacks permission, or other errors occur
+    """
+    if not store_id or not user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing store ID or user ID parameter"
+        )
+
+    try:
+        db = get_firestore_client()
+
+        # Check if store exists
+        store_ref = db.collection('stores').document(store_id)
+        store_doc = store_ref.get()
+        if not store_doc.exists:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Store with ID {store_id} not found"
+            )
+
+        # Check if user has owner access to this store
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
+        if not user_doc.exists:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
+
+        user_data = user_doc.to_dict() or {}
+        user_stores = user_data.get('stores', [])
+
+        # Find user's role for this store
+        user_store_role = None
+        for store in user_stores:
+            if store.get('id') == store_id:
+                user_store_role = store.get('role')
+                break
+
+        # Check if user has owner/admin permissions
+        if user_store_role not in ['owner', 'ADMIN']:
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied: Only store owners can update store information"
+            )
+
+        # Build update dictionary with only provided fields
+        update_dict = {"updatedAt": firestore.firestore.SERVER_TIMESTAMP}
+
+        if store_data.name is not None:
+            update_dict["name"] = store_data.name
+        if store_data.description is not None:
+            update_dict["description"] = store_data.description
+        if store_data.imageUrl is not None:
+            update_dict["imageUrl"] = store_data.imageUrl
+
+        # Update the store
+        store_ref.update(update_dict)
+
+        # Return updated store data
+        updated_store_doc = store_ref.get()
+        updated_store_data = updated_store_doc.to_dict()
+        updated_store_data['id'] = store_id
+
+        return updated_store_data
+
+    except HTTPException:
+        # Re-raise HTTP exceptions to preserve status code and detail
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(exc)}"
+        )

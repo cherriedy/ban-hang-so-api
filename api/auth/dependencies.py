@@ -1,7 +1,7 @@
 """
 Authentication and authorization dependencies for FastAPI endpoints.
 """
-
+import os
 from typing import Optional
 
 from fastapi import HTTPException, Header, Depends
@@ -25,6 +25,10 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
     Raises:
         HTTPException: If token is invalid or missing
     """
+    # Bypass authentication for local development
+    if os.getenv("ENV") == "local":
+        return "local-test-user-id"
+
     if not authorization:
         raise HTTPException(
             status_code=401,
@@ -57,6 +61,13 @@ async def verify_store_access(user_id: str, store_id: str) -> dict:
     Raises:
         HTTPException: If user doesn't have access to the store
     """
+    # Bypass store access verification for local development
+    if os.getenv("ENV") == "local":
+        return {
+            "id": store_id,
+            "role": "owner"  # Default to owner role for local testing
+        }
+
     try:
         db = get_firestore_client()
         user_ref = db.collection('users').document(user_id)
@@ -114,4 +125,33 @@ async def get_authorized_store_access(
         HTTPException: If authentication fails or user lacks store access
     """
     store_info = await verify_store_access(user_id, store_id)
+    return user_id, store_info
+
+
+async def get_store_owner_access(
+        store_id: str,
+        user_id: str = Depends(get_current_user_id)
+) -> tuple[str, dict]:
+    """
+    Dependency that verifies user is an owner of the specified store.
+    Required for operations like creating staffs accounts.
+
+    Args:
+        store_id: The ID of the store to access
+        user_id: The authenticated user ID (injected by dependency)
+
+    Returns:
+        tuple: (user_id, store_info)
+
+    Raises:
+        HTTPException: If authentication fails or user is not store owner
+    """
+    store_info = await verify_store_access(user_id, store_id)
+
+    if store_info.get('role') != 'owner':
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied: Only store owners can perform this action"
+        )
+
     return user_id, store_info

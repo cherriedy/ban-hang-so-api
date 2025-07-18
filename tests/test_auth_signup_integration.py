@@ -29,13 +29,13 @@ class TestSignupEndpoint:
 
     @pytest.fixture
     def staff_signup_payload(self):
-        """Valid staff signup payload."""
+        """Valid staffs signup payload."""
         return {
-            "email": "staff@example.com",
+            "email": "staffs@example.com",
             "password": "password123",
             "displayName": "Staff Member",
             "phone": "0987654321",
-            "role": "staff",
+            "role": "staffs",
             "storeId": "existing_store_id"
         }
 
@@ -112,7 +112,7 @@ class TestSignupEndpoint:
             assert data["data"]["stores"][0]["role"] == "ADMIN"
 
     def test_staff_signup_endpoint_success(self, client, staff_signup_payload):
-        """Test successful staff signup through the API endpoint."""
+        """Test successful staffs signup through the API endpoint."""
         with patch('api.auth.services.auth') as mock_auth, \
              patch('api.auth.services.db') as mock_db:
             
@@ -138,7 +138,7 @@ class TestSignupEndpoint:
             mock_user_doc = MagicMock()
             mock_user_doc.exists = True
             mock_user_doc.to_dict.return_value = {
-                "email": "staff@example.com",
+                "email": "staffs@example.com",
                 "contactName": "Staff Member",
                 "phone": "0987654321",
                 "createdAt": mock_created_at,  # Use mock Firestore timestamp
@@ -168,7 +168,7 @@ class TestSignupEndpoint:
             
             assert data["status"] == "success"
             assert data["data"]["id"] == "test_user_id"  # Check user ID is included
-            assert data["data"]["email"] == "staff@example.com"
+            assert data["data"]["email"] == "staffs@example.com"
             assert data["data"]["contactName"] == "Staff Member"
             assert len(data["data"]["stores"]) == 1
             assert data["data"]["stores"][0]["id"] == "existing_store_id"
@@ -186,7 +186,7 @@ class TestSignupEndpoint:
         assert response.status_code == 400
         data = response.json()
         assert data["status"] == "error"
-        assert "Role must be either 'owner' or 'staff'" in data["message"]
+        assert "Role must be either 'owner' or 'staffs'" in data["message"]
 
     def test_signup_owner_missing_store_info_400(self, client):
         """Test owner signup without store info returns 400."""
@@ -204,11 +204,11 @@ class TestSignupEndpoint:
         assert "Store information is required for owner role" in data["message"]
 
     def test_signup_staff_missing_store_id_400(self, client):
-        """Test staff signup without store ID returns 400."""
+        """Test staffs signup without store ID returns 400."""
         payload = {
-            "email": "staff@example.com",
+            "email": "staffs@example.com",
             "password": "password123",
-            "role": "staff"
+            "role": "staffs"
             # Missing storeId
         }
 
@@ -216,10 +216,10 @@ class TestSignupEndpoint:
         assert response.status_code == 400
         data = response.json()
         assert data["status"] == "error"
-        assert "Store ID is required for staff role" in data["message"]
+        assert "Store ID is required for staffs role" in data["message"]
 
     def test_signup_staff_nonexistent_store_400(self, client, staff_signup_payload):
-        """Test staff signup with nonexistent store returns 400."""
+        """Test staffs signup with nonexistent store returns 400."""
         with patch('api.auth.services.db') as mock_db:
             # Mock nonexistent store
             mock_store_ref = MagicMock()
@@ -352,7 +352,7 @@ class TestSignupEndpoint:
             mock_store_ref.delete.assert_called_once()  # Store should be rolled back for owner
 
     def test_staff_signup_rollback_no_store_cleanup(self, client, staff_signup_payload):
-        """Test that staff signup rollback only cleans up Firebase Auth, not store."""
+        """Test that staffs signup rollback only cleans up Firebase Auth, not store."""
         with patch('api.auth.services.auth') as mock_auth, \
              patch('api.auth.services.db') as mock_db:
 
@@ -391,7 +391,7 @@ class TestSignupEndpoint:
 
             # Verify only Firebase Auth was rolled back (not the existing store)
             mock_auth.delete_user.assert_called_once_with("test_user_id")
-            mock_store_ref.delete.assert_not_called()  # Store should NOT be deleted for staff
+            mock_store_ref.delete.assert_not_called()  # Store should NOT be deleted for staffs
 
     def test_signup_store_info_validation(self, client):
         """Test store info validation for owner signup."""
