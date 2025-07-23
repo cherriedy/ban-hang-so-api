@@ -9,8 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from api.auth.dependencies import get_current_user_id
 from api.common.schemas import JSendResponse
-from .schemas import SummaryResponse
-from .services import get_transaction_statistics
+from .schemas import SummaryResponse, SalesReportResponse
+from .services import get_transaction_statistics, get_sales_report
 
 router = APIRouter()
 
@@ -162,5 +162,66 @@ async def get_summary(
     except Exception as e:
         return JSendResponse.error(
             message=f"Failed to get summary: {str(e)}",
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@router.get("/sale", response_model=JSendResponse[SalesReportResponse])
+async def get_sales_report_endpoint(
+    start_date: Optional[str] = Query(None, description="Start date for sales report (YYYY, YYYY-MM, or YYYY-MM-DD). Defaults to current month if not provided."),
+    end_date: Optional[str] = Query(None, description="End date for sales report (YYYY, YYYY-MM, or YYYY-MM-DD). Defaults to current date if not provided."),
+    auth_info: tuple = Depends(get_store_auth)
+):
+    """
+    Get comprehensive sales report for a specific store.
+
+    Returns detailed sales analytics including:
+    - Total revenue, cost, and profit
+    - Daily breakdown of revenue and transactions
+    - Summary statistics with averages and totals
+
+    The response follows JSend format and includes:
+    - currency: Currency code (VND)
+    - granularity: Data granularity (daily)
+    - dateRange: Date range of the report
+    - revenue: Total revenue in the period
+    - cost: Total cost in the period
+    - profit: Total profit (revenue - cost)
+    - revenueByDate: Daily revenue breakdown in thousands
+    - transactionsByDate: Daily transaction count breakdown
+    - summary: Summary statistics including averages and totals
+
+    Args:
+        start_date: Start date for the report (optional, defaults to first day of current month)
+        end_date: End date for the report (optional, defaults to current date)
+        auth_info: Authentication and authorization info (injected)
+
+    Returns:
+        JSendResponse containing comprehensive sales report data
+    """
+    try:
+        user_id, store_info = auth_info
+        store_id = store_info['id']
+
+        # Parse dates using flexible format
+        parsed_start_date = parse_flexible_date(start_date) if start_date else None
+        parsed_end_date = parse_flexible_date(end_date, is_end_date=True) if end_date else None
+
+        # Get sales report
+        sales_report = await get_sales_report(
+            store_id=store_id,
+            start_date=parsed_start_date,
+            end_date=parsed_end_date
+        )
+
+        return JSendResponse.success(sales_report)
+    except HTTPException as e:
+        return JSendResponse.error(
+            message=str(e.detail),
+            code=e.status_code
+        )
+    except Exception as e:
+        return JSendResponse.error(
+            message=f"Failed to get sales report: {str(e)}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

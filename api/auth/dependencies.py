@@ -25,11 +25,15 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
     Raises:
         HTTPException: If token is invalid or missing
     """
-    # Bypass authentication for local development
-    if os.getenv("ENV") == "local":
+    print(f"DEBUG: get_current_user_id called with authorization header: {authorization[:50] if authorization else None}...")
+
+    # Only bypass authentication for local development if no authorization header is provided
+    if os.getenv("ENV") == "local" and not authorization:
+        print("DEBUG: Local environment detected with no auth header, bypassing authentication")
         return "local-test-user-id"
 
     if not authorization:
+        print("DEBUG: No authorization header provided")
         raise HTTPException(
             status_code=401,
             detail="Authorization header is required"
@@ -38,9 +42,14 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
     try:
         # Extract token from "Bearer <token>" format
         token = authorization.replace("Bearer ", "")
+        print(f"DEBUG: Extracted token (first 50 chars): {token[:50]}...")
+
         decoded_token = auth.verify_id_token(token)
-        return decoded_token["uid"]
+        user_id = decoded_token["uid"]
+        print(f"DEBUG: Successfully decoded token, user_id: {user_id}")
+        return user_id
     except Exception as e:
+        print(f"DEBUG: Token verification failed: {str(e)}")
         raise HTTPException(
             status_code=401,
             detail=f"Invalid authentication token: {str(e)}"
@@ -148,7 +157,7 @@ async def get_store_owner_access(
     """
     store_info = await verify_store_access(user_id, store_id)
 
-    if store_info.get('role') != 'owner':
+    if store_info.get('role') not in ['owner', 'ADMIN']:
         raise HTTPException(
             status_code=403,
             detail="Access denied: Only store owners can perform this action"

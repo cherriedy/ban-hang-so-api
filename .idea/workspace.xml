@@ -4,55 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Refactor product creation endpoint to use storeId from query parameter and update schemas for consistency">
-      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/brands/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/brands/routers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/brands/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/brands/services.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/common/cache.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/common/email_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/common/search.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/common/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/customers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/customers/routers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/customers/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/customers/services.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/sales/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/sales/routers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/sales/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/sales/services.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/staffs/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/staffs/routers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/staffs/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/staffs/services.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/transactions/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/transactions/constants.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/transactions/routers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/transactions/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api/transactions/services.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_dob_validation.py" afterDir="false" />
+    <list default="true" id="0f53e446-93a4-4d30-adfc-e4c6754e87b5" name="Changes" comment="Add modules for brands, reports, transactions, and staff management with CRUD operations">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/auth/dependencies.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/dependencies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/auth/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/auth/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/categories/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/categories/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/categories/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/categories/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/categories/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/categories/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/common/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/common/storage.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/common/storage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/routers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/products/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/products/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/reports/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/reports/routers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/reports/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/reports/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/reports/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/reports/services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/stores/routers.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/stores/routers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/stores/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/stores/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/stores/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/stores/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_auth_signup_integration.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +174,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-598b0484d0b5-e2d783800521-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26927.74" />
+        <option value="bundled-python-sdk-4c141bd692a7-e2d783800521-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26927.90" />
       </set>
     </attachedChunks>
   </component>
@@ -537,7 +498,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751273028680</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Add modules for brands, reports, transactions, and staff management with CRUD operations">
+      <option name="closed" value="true" />
+      <created>1752856442925</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1752856442926</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -552,7 +521,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update product sorting logic to support ascending and descending order" />
     <MESSAGE value="Refactor product schemas and services to remove unused fields" />
     <MESSAGE value="Refactor product service responses to include pagination and update price field to sellingPrice" />
     <MESSAGE value="Add product detail response model and update product retrieval endpoint" />
@@ -577,6 +545,7 @@
     <MESSAGE value="Add category management endpoints with CRUD operations and schema definitions" />
     <MESSAGE value="Refactor user role assignments in store creation to use consistent naming" />
     <MESSAGE value="Refactor product creation endpoint to use storeId from query parameter and update schemas for consistency" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor product creation endpoint to use storeId from query parameter and update schemas for consistency" />
+    <MESSAGE value="Add modules for brands, reports, transactions, and staff management with CRUD operations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add modules for brands, reports, transactions, and staff management with CRUD operations" />
   </component>
 </project>

@@ -1,13 +1,14 @@
 """
 Services for handling reports business logic.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from typing import Optional
+from collections import defaultdict
 
 from firebase_admin import firestore
 
-from .schemas import SummaryResponse
+from .schemas import SummaryResponse, SalesReportResponse, DateRangeSchema, DataPointSchema, RevenueByDateSchema, TransactionsByDateSchema, SummaryStatsSchema
 
 
 # Set Vietnam timezone
@@ -114,3 +115,119 @@ async def get_transaction_statistics(
         customers=len(unique_customers),
         date=datetime.now(VIETNAM_TZ)
     )
+
+
+async def get_sales_report(
+    store_id: str,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None
+) -> SalesReportResponse:
+    """
+    Generate comprehensive sales report for a store within a date range.
+    """
+    db = get_firestore_client()
+
+    # Default to current month if no dates provided
+    if start_date is None or end_date is None:
+        now = datetime.now(VIETNAM_TZ)
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_date = now
+
+    # Build query for transactions in the store
+    query = db.collection(TRANSACTIONS_COLLECTION).where("storeId", "==", store_id)
+    transactions_docs = list(query.stream())
+
+    # Initialize data structures
+    daily_revenue = defaultdict(float)
+    daily_transactions = defaultdict(int)
+    daily_cost = defaultdict(float)
+
+    total_revenue = 0.0
+    total_cost = 0.0
+    total_transactions = 0
+
+    # Process transactions
+    for doc in transactions_docs:
+        transaction_data = doc.to_dict()
+        created_at = transaction_data.get("createdAt")
+
+        if not created_at:
+            continue
+
+        # Filter by date range
+        if created_at < start_date or created_at > end_date:
+            continue
+
+        # Get date key for grouping
+        date_key = created_at.strftime("%Y-%m-%d")
+
+        # Extract financial data
+        revenue = transaction_data.get("totalSellingPrices", 0.0)
+        cost = transaction_data.get("totalCostPrices", 0.0)
+
+        # Aggregate data
+        daily_revenue[date_key] += revenue
+        daily_cost[date_key] += cost
+        daily_transactions[date_key] += 1
+
+        total_revenue += revenue
+        total_cost += cost
+        total_transactions += 1
+
+    # Generate date range for report
+    current_date = start_date.date()
+    end_date_only = end_date.date()
+    date_list = []
+
+    while current_date <= end_date_only:
+        date_list.append(current_date.strftime("%Y-%m-%d"))
+        current_date += timedelta(days=1)
+
+    # Convert revenue to thousands and prepare data points
+    revenue_data_points = []
+    transaction_data_points = []
+    revenue_values = []
+
+    for date_str in date_list:
+        revenue_in_thousands = daily_revenue[date_str] / 1000.0
+        revenue_values.append(revenue_in_thousands)
+
+        revenue_data_points.append(DataPointSchema(
+            date=date_str,
+            value=revenue_in_thousands
+        ))
+
+        transaction_data_points.append(DataPointSchema(
+            date=date_str,
+            value=daily_transactions[date_str]
+        ))
+
+    # Calculate summary statistics
+    avg_revenue = sum(revenue_values) / len(revenue_values) if revenue_values else 0
+    max_revenue = max(revenue_values) if revenue_values else 0
+
+    return SalesReportResponse(
+        currency="VND",
+        granularity="daily",
+        dateRange=DateRangeSchema(
+            start=start_date.strftime("%Y-%m-%d"),
+            end=end_date.strftime("%Y-%m-%d")
+        ),
+        revenue=total_revenue,
+        cost=total_cost,
+        profit=total_revenue - total_cost,
+        revenueByDate=RevenueByDateSchema(
+            unit="thousand",
+            data=revenue_data_points
+        ),
+        transactionsByDate=TransactionsByDateSchema(
+            data=transaction_data_points
+        ),
+        summary=SummaryStatsSchema(
+            averageRevenue=avg_revenue,
+            maxRevenue=max_revenue,
+            totalTransactions=total_transactions,
+            unit="thousand"
+        )
+    )
+

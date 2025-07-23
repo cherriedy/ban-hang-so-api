@@ -3,11 +3,11 @@ This module defines the Pydantic models used for store management.
 These models are used for request and response validation and serialization.
 """
 
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
-from api.common.schemas import TimestampMixin
+from api.common.schemas import TimestampMixin, PaginationResponse, JSendResponse
 
 
 class UserStore(BaseModel, TimestampMixin):
@@ -19,6 +19,25 @@ class UserStore(BaseModel, TimestampMixin):
     role: str
     name: Optional[str] = None
     description: Optional[str] = None
+
+
+class StoreDetail(BaseModel, TimestampMixin):
+    """
+    Represents detailed information about a store.
+    Used for store detail responses.
+    """
+    id: str
+    name: str
+    description: str
+    imageUrl: Optional[str] = None
+
+
+class StoreDetailData(BaseModel):
+    """
+    Wrapper for store detail data that contains the store in an "item" field.
+    Used for the store detail endpoint response structure.
+    """
+    item: StoreDetail
 
 
 class CreateStoreRequest(BaseModel):
@@ -49,8 +68,17 @@ class CreateStoreResponse(BaseModel):
     store_id: str
 
 
-class UserStoresData(BaseModel):
+class UserStoresData(PaginationResponse[UserStore]):
     """
-    Stores data returned for a user in JSend format
+    Paginated stores data returned for a user in JSend format.
+    Inherits pagination fields from PaginationResponse and specifies
+    UserStore as the item type.
     """
-    stores: List[UserStore]
+    pass
+
+
+class UserStoresResponse(JSendResponse[UserStoresData]):
+    """
+    Response model for user stores operations with pagination using generic PaginationResponse.
+    """
+    pass
